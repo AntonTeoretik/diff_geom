@@ -4,8 +4,11 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp \
-        vec.cpp
+        algebra.cpp \
+        geometry.cpp \
+        main.cpp
 
 HEADERS += \
-    vec.h
+    algebra.h \
+    constants.h \
+    geometry.h
