@@ -56,6 +56,12 @@ double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, Point
     return res * 0.5;
 }
 
+template<std::size_t N>
+Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, Point<N> p) const
+{
+    return Matrix2D<N>([this, l, p](auto i, auto j){return this->krist(l, i, j, p);});
+}
+
 
 template<std::size_t N>
 double MetricTensor<N>::operator()(Point<N> p, Vec<N> vec1, Vec<N> vec2) const
@@ -66,3 +72,32 @@ double MetricTensor<N>::operator()(Point<N> p, Vec<N> vec1, Vec<N> vec2) const
 template class MetricTensor<3>;
 template class MetricTensor<2>;
 
+
+template<std::size_t N>
+std::vector<Point<N> > geodesic(const MetricTensor<N> &g, Point<N> start, Vec<N> vel, std::size_t steps_num, double dt)
+{
+    Point<N> prev = start;
+    Point<N> now = start + (vel * dt);
+    Point<N> next;
+
+    std::vector<Point<N>> res = {prev, now};
+
+    for (std::size_t i = 0; i < steps_num; i++) {
+        res.push_back(now);
+
+        Vec<N> curv;
+        for (size_t l = 0; l < N; l++)
+            curv[l] = (now - prev) * (g.kristMatrix(l, now) * (now - prev));
+
+        next = now * 2 - prev - curv;
+
+        prev = now;
+        now = next;
+    }
+
+    return res;
+}
+
+
+template std::vector<Point<2> > geodesic(const MetricTensor<2> &g, Point<2> start, Vec<2> vel, std::size_t steps_num, double dt);
+template std::vector<Point<3> > geodesic(const MetricTensor<3> &g, Point<3> start, Vec<3> vel, std::size_t steps_num, double dt);

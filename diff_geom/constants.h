@@ -3,6 +3,7 @@
 
 
 const double eps = 0.00001;
+const double time_step = 0.001;
 
 
 #endif // CONSTANTS_H

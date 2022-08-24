@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <array>
+#include <vector>>
 #include <constants.h>
 
 #include <algebra.h>
@@ -32,6 +33,7 @@ public:
     virtual double getCoord(Point<N> P, std::size_t i, std::size_t j) const;
 
     double krist(std::size_t l, std::size_t j , std::size_t k, Point<N> p) const; // Returns Г^l_jk
+    Matrix2D<N> kristMatrix(std::size_t l, Point<N> p) const; // Returns Г^l_jk
 };
 
 
@@ -41,6 +43,11 @@ inline double partialDer(Point<N> A, Vec<N> dir, std::function<double(Point<N>)>
     return (f(A + dir * step) - f(A + dir * (-step))) / (2 * step) ;
 }
 
+
+// Geodesic 1
+
+template<std::size_t N>
+std::vector<Point<N>> geodesic(const MetricTensor<N> &g, Point<N> start, Vec<N> vel, std::size_t steps_num, double dt = time_step);
 
 
 #endif // GEOMETRY_H

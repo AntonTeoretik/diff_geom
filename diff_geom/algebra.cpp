@@ -20,6 +20,15 @@ Vec<N> Vec<N>::operator+(const Vec<N> &B) const
 }
 
 template<std::size_t N>
+Vec<N> Vec<N>::operator-(const Vec<N> &B) const
+{
+    Vec<N> res;
+    for(std::size_t i = 0; i < N; i++)
+        res[i] = (*this)[i] - B[i];
+    return res;
+}
+
+template<std::size_t N>
 Vec<N> Vec<N>::operator*(const double &a) const
 {
     Vec<N> res;
