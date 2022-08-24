@@ -93,7 +93,7 @@ Matrix2D<3> Matrix2D<3>::inverse() const
     double detinv = 1.0 / (a11*a22*a33 + a13*a21*a32 + a12*a23*a31 - a13*a22*a31 - a12*a21*a33 - a11*a23*a32);
 
     Matrix2D<3> adj = {
-        Vec<3>{ a22*a33 - a23*a32, -a12*a33 + a13*a32, a23*a12 - a22*a13   },
+        Vec<3>{ a22*a33 - a23*a32, -a12*a33 + a13*a32, a23*a12 - a22*a13 },
         Vec<3>{-a21*a33 + a31*a23,  a11*a33 - a31*a13, -a11*a23 + a21*a13 },
         Vec<3>{a21*a32 - a22*a31, -a11*a32 + a12*a31,  a22*a11 - a21*a12},
     };

@@ -40,7 +40,16 @@ public:
 
 };
 
-// Matrix inversion
+template <std::size_t N>
+std::array<Vec<N>, N> basis = []() {
+    std::array<Vec<N>, N> res;
+    for(std::size_t i = 0; i < N; i++) {
+        for(std::size_t j = 0; j < N; j++) {
+            res[i][j] = (i == j ? 1 : 0);
+        }
+    }
+    return res;
+}();
 
 
 #endif // ALGEBRA_H
