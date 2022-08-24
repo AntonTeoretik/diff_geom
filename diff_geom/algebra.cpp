@@ -2,7 +2,7 @@
 
 
 template<std::size_t N>
-std::string Vec<N>::to_str()
+std::string Vec<N>::to_str() const
 {
     std::string res = "";
     for (auto c : (*this))
@@ -11,7 +11,7 @@ std::string Vec<N>::to_str()
 }
 
 template<std::size_t N>
-Vec<N> Vec<N>::operator+(const Vec<N> &B)
+Vec<N> Vec<N>::operator+(const Vec<N> &B) const
 {
     Vec<N> res;
     for(std::size_t i = 0; i < N; i++)
@@ -20,7 +20,7 @@ Vec<N> Vec<N>::operator+(const Vec<N> &B)
 }
 
 template<std::size_t N>
-Vec<N> Vec<N>::operator*(const double &a)
+Vec<N> Vec<N>::operator*(const double &a) const
 {
     Vec<N> res;
     for(std::size_t i = 0; i < N; i++)
@@ -29,7 +29,7 @@ Vec<N> Vec<N>::operator*(const double &a)
 }
 
 template<std::size_t N>
-double Vec<N>::norm2()
+double Vec<N>::norm2() const
 {
     double res = 0;
     for (auto c : (*this))
@@ -38,13 +38,13 @@ double Vec<N>::norm2()
 }
 
 template<std::size_t N>
-double Vec<N>::norm()
+double Vec<N>::norm() const
 {
     return sqrt(norm2());
 }
 
 template<std::size_t N>
-Vec<N> Vec<N>::nomalize()
+Vec<N> Vec<N>::nomalized() const
 {
     return (*this) * (1 / norm());
 }
@@ -54,13 +54,13 @@ Vec<N> Vec<N>::nomalize()
 
 
 template<>
-Matrix2D<1> Matrix2D<1>::inverse()
+Matrix2D<1> Matrix2D<1>::inverse() const
 {
     return {Vec<1>{1.0 / (*this)[0][0]}};
 }
 
 template<>
-Matrix2D<2> Matrix2D<2>::inverse()
+Matrix2D<2> Matrix2D<2>::inverse() const
 {
     double a = (*this)[0][0];
     double b = (*this)[0][1];
@@ -76,7 +76,7 @@ Matrix2D<2> Matrix2D<2>::inverse()
 }
 
 template<>
-Matrix2D<3> Matrix2D<3>::inverse()
+Matrix2D<3> Matrix2D<3>::inverse() const
 {
     double a11 = (*this)[0][0];
     double a12 = (*this)[0][1];
@@ -93,9 +93,9 @@ Matrix2D<3> Matrix2D<3>::inverse()
     double detinv = 1.0 / (a11*a22*a33 + a13*a21*a32 + a12*a23*a31 - a13*a22*a31 - a12*a21*a33 - a11*a23*a32);
 
     Matrix2D<3> adj = {
-        Vec<3>{ a22*a33 - a23*a32, -a21*a33 + a31*a23,  a21*a32 - a22*a31},
-        Vec<3>{ a13*a32 - a12*a33,  a11*a33 - a31*a13, -a11*a32 + a12*a31},
-        Vec<3>{ a23*a12 - a22*a13, -a21*a13 + a11*a23,  a22*a11 - a21*a12},
+        Vec<3>{ a22*a33 - a23*a32, -a12*a33 + a13*a32, a23*a12 - a22*a13   },
+        Vec<3>{-a21*a33 + a31*a23,  a11*a33 - a31*a13, -a11*a23 + a21*a13 },
+        Vec<3>{a21*a32 - a22*a31, -a11*a32 + a12*a31,  a22*a11 - a21*a12},
     };
 
     for(std::size_t i = 0; i < 3; i++)
@@ -106,7 +106,48 @@ Matrix2D<3> Matrix2D<3>::inverse()
 }
 
 template<std::size_t N>
-std::string Matrix2D<N>::to_str()
+Vec<N> Matrix2D<N>::operator*(const Vec<N> &A) const
+{
+    Vec<N> res;
+    for(std::size_t i = 0; i < N; i++) {
+        double subres = 0.0;
+        for(std::size_t j = 0; j < N; j++)
+            subres += (*this)[i][j] * A[j];
+        res[i] = subres;
+    }
+    return res;
+}
+
+template<std::size_t N>
+Matrix2D<N> Matrix2D<N>::operator*(const Matrix2D<N> &A) const
+{
+    Matrix2D<N> res;
+    for(std::size_t i = 0; i < N; i++) {
+        for(std::size_t j = 0; j < N; j++) {
+            double subres = 0.0;
+            for(std::size_t r = 0; r < N; r++) {
+                subres += (*this)[i][r] * A[r][j];
+            }
+            res[i][j] = subres;
+        }
+    }
+    return res;
+}
+
+template<std::size_t N>
+Matrix2D<N> Matrix2D<N>::operator*(double a) const
+{
+    Matrix2D<N> res;
+    for(std::size_t i = 0; i < N; i++) {
+        for(std::size_t j = 0; j < N; j++) {
+            res[i][j] = (*this)[i][j] * a;
+        }
+    }
+    return res;
+}
+
+template<std::size_t N>
+std::string Matrix2D<N>::to_str() const
 {
     std::string str = "";
     for(std::size_t i = 0; i < N; i++) {

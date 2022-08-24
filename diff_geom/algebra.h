@@ -12,15 +12,15 @@ template <std::size_t N>
 class Vec : public std::array<double, N>
 {
 public:
-    std::string to_str();
+    std::string to_str() const;
 
-    Vec<N> operator+ (const Vec<N>& B);
-    Vec<N> operator* (const double& a); // We have right multiplication
+    Vec<N> operator+ (const Vec<N>& B) const;
+    Vec<N> operator* (const double& a) const; // We have right multiplication
 
-    double norm2();
-    double norm();
+    double norm2() const;
+    double norm() const;
 
-    Vec<N> nomalize();
+    Vec<N> nomalized() const;
 };
 
 template <std::size_t N>
@@ -30,8 +30,13 @@ template <std::size_t N>
 class Matrix2D : public std::array<std::array<double, N>, N>
 {
 public:
-    Matrix2D<N> inverse();
-    std::string to_str();
+    Matrix2D<N> inverse() const;
+    Vec<N> operator* (const Vec<N>& A) const;
+    Matrix2D<N> operator* (const Matrix2D<N>& M) const;
+    Matrix2D<N> operator* (double a) const;
+
+
+    std::string to_str() const;
 
 };
 
