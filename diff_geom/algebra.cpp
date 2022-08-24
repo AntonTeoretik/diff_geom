@@ -29,6 +29,15 @@ Vec<N> Vec<N>::operator*(const double &a) const
 }
 
 template<std::size_t N>
+double Vec<N>::operator*(const Vec<N> &v) const
+{
+    double res = 0;
+    for(std::size_t i = 0; i < N; i++)
+        res += (*this)[i] * v[i];
+    return res;
+}
+
+template<std::size_t N>
 double Vec<N>::norm2() const
 {
     double res = 0;
@@ -72,12 +81,6 @@ Matrix2D<2> Matrix2D<2>::inverse() const
         Vec<2>{-c * detinv, a * detinv}
     };
 }
-
-//template<std::size_t N>
-//Matrix2D<N>::Matrix2D<N>(std::function<double (int, int)> f)
-//{
-
-//}
 
 
 template<std::size_t N>
@@ -140,29 +143,21 @@ Vec<N> Matrix2D<N>::operator*(const Vec<N> &A) const
 template<std::size_t N>
 Matrix2D<N> Matrix2D<N>::operator*(const Matrix2D<N> &A) const
 {
-    Matrix2D<N> res;
-    for(std::size_t i = 0; i < N; i++) {
-        for(std::size_t j = 0; j < N; j++) {
-            double subres = 0.0;
-            for(std::size_t r = 0; r < N; r++) {
-                subres += (*this)[i][r] * A[r][j];
-            }
-            res[i][j] = subres;
+    return Matrix2D<N>([this, A](std::size_t i, std::size_t j){
+        double subres = 0.0;
+        for(std::size_t r = 0; r < N; r++) {
+            subres += (*this)[i][r] * A[r][j];
         }
-    }
-    return res;
+        return subres;
+    });
 }
 
 template<std::size_t N>
 Matrix2D<N> Matrix2D<N>::operator*(double a) const
 {
-    Matrix2D<N> res;
-    for(std::size_t i = 0; i < N; i++) {
-        for(std::size_t j = 0; j < N; j++) {
-            res[i][j] = (*this)[i][j] * a;
-        }
-    }
-    return res;
+    return Matrix2D<N>([this, a](std::size_t i, std::size_t j){
+        return (*this)[i][j] * a;
+    });
 }
 
 template<std::size_t N>

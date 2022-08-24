@@ -29,8 +29,13 @@ double MetricTensor<N>::operator()(Point<N> p, std::array<Vec<N>, 2> vecs) const
 template<std::size_t N>
 Matrix2D<N> MetricTensor<N>::getMatrix(Point<N> P) const
 {
-    Matrix2D<N> res;
-    return res; // TODO
+    return Matrix2D<N>([this, P](int i, int j){return this->g(P, basis<N>[i], basis<N>[j]); });
+}
+
+template<std::size_t N>
+double MetricTensor<N>::getCoord(Point<N> P, std::size_t i, std::size_t j) const
+{
+    return g(P, basis<N>[i], basis<N>[j]);
 }
 
 template<std::size_t N>
@@ -38,9 +43,17 @@ double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, Point
 {
     double res = 0;
 
+    Matrix2D<N> Mg = getMatrix(p);
+    Matrix2D<N> MgInv = Mg.inverse();
 
+    for(std::size_t r = 0; r < N; r++) {
+        double dk_grj = partialDer<N>(p, basis<N>[k], [this, r, j](Point<N> pp){return this->getCoord(pp, r, j);} );
+        double dj_grk = partialDer<N>(p, basis<N>[j], [this, r, k](Point<N> pp){return this->getCoord(pp, r, k);} );
+        double dr_gjk = partialDer<N>(p, basis<N>[r], [this, k, j](Point<N> pp){return this->getCoord(pp, j, k);} );
 
-    return res;
+        res += MgInv[l][r] * ( dk_grj + dj_grk - dr_gjk );
+    }
+    return res * 0.5;
 }
 
 

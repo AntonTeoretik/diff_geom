@@ -17,6 +17,7 @@ public:
 
     Vec<N> operator+ (const Vec<N>& B) const;
     Vec<N> operator* (const double& a) const; // We have right multiplication
+    double operator* (const Vec<N>& B) const; // Scalar multiplication
 
     double norm2() const;
     double norm() const;

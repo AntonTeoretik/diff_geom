@@ -29,9 +29,9 @@ public:
     virtual double operator() (Point<N>, Vec<N>, Vec<N>) const;
 
     virtual Matrix2D<N> getMatrix(Point<N> P) const;
+    virtual double getCoord(Point<N> P, std::size_t i, std::size_t j) const;
 
-
-    double krist(std::size_t l, std::size_t j , std::size_t k, Point<N> p) const;
+    double krist(std::size_t l, std::size_t j , std::size_t k, Point<N> p) const; // Returns Г^l_jk
 };
 
 
