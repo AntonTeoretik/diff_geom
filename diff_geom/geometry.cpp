@@ -26,6 +26,14 @@ double MetricTensor<N>::operator()(Point<N> p, std::array<Vec<N>, 2> vecs) const
     return g(p, vecs[0], vecs[1]);
 }
 
+
+template<std::size_t N>
+double MetricTensor<N>::operator()(Point<N> p, Vec<N> vec1, Vec<N> vec2) const
+{
+    return g(p, vec1, vec2);
+}
+
+
 template<std::size_t N>
 Matrix2D<N> MetricTensor<N>::getMatrix(Point<N> P) const
 {
@@ -63,12 +71,6 @@ Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, Point<N> p) const
 }
 
 
-template<std::size_t N>
-double MetricTensor<N>::operator()(Point<N> p, Vec<N> vec1, Vec<N> vec2) const
-{
-    return g(p, vec1, vec2);
-}
-
 template class MetricTensor<3>;
 template class MetricTensor<2>;
 
@@ -99,5 +101,33 @@ std::vector<Point<N> > geodesic(const MetricTensor<N> &g, Point<N> start, Vec<N>
 }
 
 
+
 template std::vector<Point<2> > geodesic(const MetricTensor<2> &g, Point<2> start, Vec<2> vel, std::size_t steps_num, double dt);
 template std::vector<Point<3> > geodesic(const MetricTensor<3> &g, Point<3> start, Vec<3> vel, std::size_t steps_num, double dt);
+
+
+template<std::size_t N, std::size_t M>
+InducedMetricTensor<N, M>::InducedMetricTensor(std::function<Point<M> (Point<N>)> f, double pres) : f(f), pres(pres)
+{
+    // This is ALMOST linear version
+    this->g = [this](Point<N> p, Vec<N> v1, Vec<N> v2)
+    {
+        double alpha1 = v1.norm();
+        double alpha2 = v2.norm();
+
+        if(alpha1 * alpha2 == 0) return 0.0; // Almost impossible, but anyway
+
+        Vec<M> dv1 = this->f(p + v1.nomalized() * this->pres) - this->f(p - v1.nomalized() * this->pres);
+        Vec<M> dv2 = this->f(p + v2.nomalized() * this->pres) - this->f(p - v2.nomalized() * this->pres);
+        return 0.5 * alpha1 * alpha2 * (dv1 * dv2) / this->pres;
+    };
+}
+
+template<std::size_t N, std::size_t M>
+Point<M> InducedMetricTensor<N, M>::apply_generator(Point<N> p) const
+{
+    return f(p);
+}
+
+template class InducedMetricTensor<2,3>;
+template class InducedMetricTensor<2,2>;

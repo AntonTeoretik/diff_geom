@@ -21,6 +21,7 @@ public:
 template<std::size_t N>
 class MetricTensor : public AbstractTensor<2,N>
 {
+protected:
     std::function<double(Point<N>, Vec<N>, Vec<N>)> g; // Must be symmetric, non degenerate
 public:
     MetricTensor<N>();
@@ -36,6 +37,18 @@ public:
     Matrix2D<N> kristMatrix(std::size_t l, Point<N> p) const; // Returns Г^l_jk
 };
 
+template <std::size_t N, std::size_t M>
+class InducedMetricTensor : public MetricTensor<N>
+{
+protected:
+    std::function<Point<M>(Point<N>)> f;
+    double pres;
+
+public:
+    InducedMetricTensor<N, M>(std::function<Point<M>(Point<N>)>, double pres=eps);
+
+    Point<M> apply_generator(Point<N>) const;
+};
 
 template<std::size_t N>
 inline double partialDer(Point<N> A, Vec<N> dir, std::function<double(Point<N>)> f, double step = eps)
