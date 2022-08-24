@@ -5,13 +5,11 @@ using namespace std;
 #include <algebra.h>
 #include <geometry.h>
 
+#include <array>
 
 int main()
 {
-
-    auto f = [](Point<2> P){return P[0]*P[0] + P[1]*P[1];};
-
-    cout << partialDer<2>({0.5,0}, basis<2>[0], f) << endl;
+    cout << Matrix2D<3>([](size_t i, size_t j){return i*i + j*j;}).to_str() << endl;
 
     return 0;
 }

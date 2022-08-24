@@ -27,9 +27,17 @@ double MetricTensor<N>::operator()(Point<N> p, std::array<Vec<N>, 2> vecs) const
 }
 
 template<std::size_t N>
+Matrix2D<N> MetricTensor<N>::getMatrix(Point<N> P) const
+{
+    Matrix2D<N> res;
+    return res; // TODO
+}
+
+template<std::size_t N>
 double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, Point<N> p) const
 {
     double res = 0;
+
 
 
     return res;

@@ -28,6 +28,9 @@ public:
     virtual double operator() (Point<N>, std::array<Vec<N>, 2>) const;
     virtual double operator() (Point<N>, Vec<N>, Vec<N>) const;
 
+    virtual Matrix2D<N> getMatrix(Point<N> P) const;
+
+
     double krist(std::size_t l, std::size_t j , std::size_t k, Point<N> p) const;
 };
 

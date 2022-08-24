@@ -3,6 +3,7 @@
 
 #include <array>
 #include <iostream>
+#include <functional>
 #include <math.h>
 
 //template <std::size_t N>
@@ -30,6 +31,11 @@ template <std::size_t N>
 class Matrix2D : public std::array<std::array<double, N>, N>
 {
 public:
+    //Matrix2D<N>();
+    Matrix2D<N>() = default;
+    Matrix2D<N>(std::initializer_list<std::array<double, N>>);
+    Matrix2D<N>(std::function<double(int, int)> f);
+
     Matrix2D<N> inverse() const;
     Vec<N> operator* (const Vec<N>& A) const;
     Matrix2D<N> operator* (const Matrix2D<N>& M) const;

@@ -51,8 +51,6 @@ Vec<N> Vec<N>::nomalized() const
 
 
 
-
-
 template<>
 Matrix2D<1> Matrix2D<1>::inverse() const
 {
@@ -75,6 +73,31 @@ Matrix2D<2> Matrix2D<2>::inverse() const
     };
 }
 
+//template<std::size_t N>
+//Matrix2D<N>::Matrix2D<N>(std::function<double (int, int)> f)
+//{
+
+//}
+
+
+template<std::size_t N>
+Matrix2D<N>::Matrix2D(std::initializer_list<std::array<double, N> > list)
+{
+    for(std::size_t i = 0; i < N; i++) {
+        (*this)[i] = std::array<double, N>{*(list.begin() + i)};
+    }
+}
+
+template<std::size_t N>
+Matrix2D<N>::Matrix2D(std::function<double (int, int)> f)
+{
+    for(std::size_t i = 0; i < N; i++) {
+        for(std::size_t j = 0; j < N; j++) {
+            (*this)[i][j] = f(i, j);
+        }
+    }
+}
+
 template<>
 Matrix2D<3> Matrix2D<3>::inverse() const
 {
@@ -93,16 +116,12 @@ Matrix2D<3> Matrix2D<3>::inverse() const
     double detinv = 1.0 / (a11*a22*a33 + a13*a21*a32 + a12*a23*a31 - a13*a22*a31 - a12*a21*a33 - a11*a23*a32);
 
     Matrix2D<3> adj = {
-        Vec<3>{ a22*a33 - a23*a32, -a12*a33 + a13*a32, a23*a12 - a22*a13 },
-        Vec<3>{-a21*a33 + a31*a23,  a11*a33 - a31*a13, -a11*a23 + a21*a13 },
-        Vec<3>{a21*a32 - a22*a31, -a11*a32 + a12*a31,  a22*a11 - a21*a12},
+        { a22*a33 - a23*a32, -a12*a33 + a13*a32, a23*a12 - a22*a13 },
+        {-a21*a33 + a31*a23,  a11*a33 - a31*a13, -a11*a23 + a21*a13 },
+        { a21*a32 - a22*a31, -a11*a32 + a12*a31,  a22*a11 - a21*a12 }
     };
 
-    for(std::size_t i = 0; i < 3; i++)
-        for(std::size_t j = 0; j < 3; j++)
-            adj[i][j] *= detinv;
-
-    return adj;
+    return adj * detinv;
 }
 
 template<std::size_t N>
