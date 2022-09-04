@@ -9,6 +9,13 @@ using namespace std;
 
 #include <array>
 
+
+double func(double x, double y)
+{
+    return -1.0 / (x*x + y*y);
+}
+
+
 int main()
 {
     MetricTensor<2> g([](Point<2> P, Vec<2> v1, Vec<2> v2){ // polar coordinates
@@ -20,10 +27,10 @@ int main()
 
     MetricTensor<2> h;
 
-    std::function<Point<3>(Point<2>)> surface = [](Point<2> p){ return Point<3>{p[0], p[1], p[0]*p[0] + p[1]*p[1]}; };
+    std::function<Point<3>(Point<2>)> surface = [](Point<2> p){ return Point<3>{p[0], p[1], func(p[0], p[1])}; };
     InducedMetricTensor surf(surface);
 
-    auto geod = geodesic(surf, {2, 0}, {0, 1}, 100000);
+    auto geod = geodesic(surf, {-5, 1}, {1, 0}, 10000, 0.01);
 
     auto fout = std::ofstream("../test.csv");
 
@@ -31,8 +38,8 @@ int main()
     fout << "x,y,z\n" ;
     for (auto p : geod) {
         i++;
-        if(i % 100 == 0) {
-            fout << p[0] << "," << p[1] << "," << p[0]*p[0] + p[1]*p[1] << "\n";
+        if(i % 10 == 0) {
+            fout << p[0] << "," << p[1] << "," << func(p[0], p[1]) << "\n";
             i = 1;
         }
     }
