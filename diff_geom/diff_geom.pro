@@ -5,12 +5,12 @@ CONFIG -= qt
 
 SOURCES += \
         algebra.cpp \
-        atlas.cpp \
         geometry.cpp \
-        main.cpp
+        main.cpp \
+        manifold.cpp
 
 HEADERS += \
     algebra.h \
-    atlas.h \
     constants.h \
-    geometry.h
+    geometry.h \
+    manifold.h
