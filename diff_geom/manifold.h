@@ -46,6 +46,7 @@ public:
     Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps);
 
     std::optional<genPoint<N>> changePointIndex(genPoint<N> pt, index newIndex);
+    std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double e=eps);
 };
 
 template <std::size_t N>
