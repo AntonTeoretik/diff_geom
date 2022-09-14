@@ -3,9 +3,9 @@
 
 #include <functional>
 #include <array>
-#include <vector>>
 #include <constants.h>
 
+#include <vector>
 #include <algebra.h>
 
 

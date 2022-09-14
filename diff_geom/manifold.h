@@ -39,11 +39,13 @@ class Manifold
 {
 protected:
     std::vector<Chart<N>> atlas;
+    index atlas_size;
     typedGraph<structMap<N>> structureMaps;
+
 public:
     Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps);
 
-    std::optional<genPoint<N>> changeIndex(genPoint<N> pt, index newIndex);
+    std::optional<genPoint<N>> changePointIndex(genPoint<N> pt, index newIndex);
 };
 
 template <std::size_t N>

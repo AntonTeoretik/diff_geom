@@ -2,8 +2,9 @@
 
 using namespace std;
 
-#include <algebra.h>
-#include <geometry.h>
+#include "algebra.h"
+#include "geometry.h"
+#include "manifold.h"
 
 #include <fstream>
 
@@ -18,7 +19,7 @@ double func(double x, double y)
 
 int main()
 {
-    MetricTensor<2> g([](Point<2> P, Vec<2> v1, Vec<2> v2){ // polar coordinates
+/*    MetricTensor<2> g([](Point<2> P, Vec<2> v1, Vec<2> v2){ // polar coordinates
         Matrix2D<2> M = { {1, 0 },
                           {0, P[0]*P[0]} };
         return v1 * (M * v2);
@@ -44,6 +45,22 @@ int main()
         }
     }
     fout.close();
+
+*/
+
+    Chart<2> c0([](auto){return true;});
+    Chart<2> c1([](auto){return true;});
+
+    structMap<2> map01([](auto p){return std::optional<Point<2>>(p + Point<2>{0.1, 0.2});});
+    structMap<2> map10([](auto p){return std::optional<Point<2>>(p - Point<2>{0.1, 0.2});});
+
+    Manifold<2> m({c0, c1},
+                  { {{0,1},  map01},
+                    {{1,0}, map10} } );
+
+    auto gp = m.changePointIndex({0, {0.0, 0.0}},0);
+    std::cout << gp.value().p.to_str() << std::endl;
+
 
     return 0;
 }
