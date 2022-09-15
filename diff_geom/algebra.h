@@ -25,6 +25,8 @@ public:
     double norm() const;
 
     Vec<N> nomalized() const;
+
+    static Vec<N> zero();
 };
 
 template <std::size_t N>

@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
         algebra.cpp \
+        ellipsoid.cpp \
         main.cpp \
         manifold.cpp \
         metric.cpp
@@ -12,5 +13,6 @@ SOURCES += \
 HEADERS += \
     algebra.h \
     constants.h \
+    ellipsoid.h \
     manifold.h \
     metric.h

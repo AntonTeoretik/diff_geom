@@ -130,4 +130,5 @@ Point<M> InducedMetricTensor<N, M>::apply_generator(Point<N> p) const
 }
 
 template class InducedMetricTensor<2,3>;
+template class InducedMetricTensor<3,4>;
 template class InducedMetricTensor<2,2>;

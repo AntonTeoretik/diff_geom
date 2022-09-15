@@ -11,7 +11,7 @@ Manifold<N>::Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<struc
 }
 
 template<std::size_t N>
-std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index newIndex)
+std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index newIndex) const
 {
     if (newIndex >= atlas_size) return {};
     if (auto it = structureMaps.find({pt.i, newIndex}); it != structureMaps.end())
@@ -23,7 +23,7 @@ std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index new
 }
 
 template<std::size_t N>
-std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double eps)
+std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double eps) const
 {
     if(v == Vec<N>{0.0,0.0}) return {{0.0,0.0}};
     auto norm = v.norm();
@@ -44,7 +44,7 @@ template class Manifold<3>;
 
 
 template<std::size_t N>
-Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, index i)
+Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, index i) const
 {
     //Try to define next point in this domain.
 
@@ -69,7 +69,7 @@ RiemannianManifold<N>::RiemannianManifold(const std::vector<Chart<N> > &atlas,
 }
 
 template<std::size_t N>
-std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step)
+std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step) const
 {
     Point<N> prev = pt.p;
     Point<N> now = prev + (dir * step); // Possible trouble here

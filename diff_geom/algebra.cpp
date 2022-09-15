@@ -67,6 +67,15 @@ Vec<N> Vec<N>::nomalized() const
     return (*this) * (1 / norm());
 }
 
+template<std::size_t N>
+Vec<N> Vec<N>::zero()
+{
+    Vec<N> res;
+    for(std::size_t i = 0; i < N; i++)
+        res[i] = 0;
+    return res;
+}
+
 
 
 template<>
@@ -186,7 +195,9 @@ std::string Matrix2D<N>::to_str() const
 
 template class Vec<2>;
 template class Vec<3>;
+template class Vec<4>;
 
 template class Matrix2D<2>;
 template class Matrix2D<3>;
+template class Matrix2D<4>;
 

@@ -52,8 +52,8 @@ protected:
 public:
     Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps);
 
-    std::optional<Point<N> > changePointIndex(genPoint<N> pt, index newIndex);
-    std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double e=eps);
+    std::optional<Point<N> > changePointIndex(genPoint<N> pt, index newIndex) const;
+    std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double e=eps) const;
 };
 
 template <std::size_t N>
@@ -61,7 +61,7 @@ class RiemannianManifold : public Manifold<N>
 {
 protected:
     std::vector<MetricTensor<N>> metric;
-    Point<N> doOneStep(Point<N> prev, Point<N> now, index i);
+    Point<N> doOneStep(Point<N> prev, Point<N> now, index i) const;
 
 public:
     RiemannianManifold(const std::vector<Chart<N>>& atlas,
@@ -69,7 +69,7 @@ public:
                        const std::vector<MetricTensor<N>>& metric);
 
     //pt must be not in the boundary of domain
-    std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step=time_step);
+    std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step=time_step) const;
 };
 
 
