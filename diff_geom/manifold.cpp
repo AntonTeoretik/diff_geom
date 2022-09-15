@@ -87,6 +87,7 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
             prev = now;
             now = next;
             res.push_back({cur_index, now});
+            continue;
         }
         // next point is outside -> need to change domain.
         for(index new_index = 0; new_index < this->atlas_size; new_index++) {

@@ -48,12 +48,24 @@ int main()
 
 */
 
-    Chart<2> c0([](auto){return true;});
+    Chart<2> c0([](Point<2> p){return (p.norm() < 1);});
+    Chart<2> c1([](Point<2> p){return ((p - Point<2>{1.0, 0}).norm() < 1);});
 
-    RiemannianManifold<2> m({c0},
-                            {}, {MetricTensor<2>()} );
 
-    std::vector<genPoint<2>> geo = m.geodesic({0, {0,0}}, {0, 1}, 100);
+
+    RiemannianManifold<2> m({c0, c1},
+
+                            { {{0,1}, [](auto p){return p;}},
+                              {{1,0}, [](auto p){return p;}},
+                            },
+
+
+                            {
+                                MetricTensor<2>(),
+                                MetricTensor<2>()
+                            } );
+
+    std::vector<genPoint<2>> geo = m.geodesic({0, {0.9, 0}}, {1.0, 0}, 200);
 
     for(auto gpt : geo) {
         std::cout << gpt.i << ", " << gpt.p.to_str() << std::endl;
