@@ -193,10 +193,12 @@ std::string Matrix2D<N>::to_str() const
 
 
 
+template class Vec<1>;
 template class Vec<2>;
 template class Vec<3>;
 template class Vec<4>;
 
+template class Matrix2D<1>;
 template class Matrix2D<2>;
 template class Matrix2D<3>;
 template class Matrix2D<4>;

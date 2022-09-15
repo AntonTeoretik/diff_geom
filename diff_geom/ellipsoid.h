@@ -13,6 +13,7 @@
 template<std::size_t N>
 class Sphere : public RiemannianManifold<N>
 {
+public:
     Point<N+1> north_pole;
     Point<N+1> south_pole;
 
@@ -26,7 +27,7 @@ class Sphere : public RiemannianManifold<N>
 
 public:
     Sphere(double controlConst = 3.0);
-    Point<N+1> immerse(genPoint<N> pt) const;
+    std::optional<Point<N+1>> immerse(genPoint<N> pt) const;
 
     Point<N+1> get_north_pole() const;
     Point<N+1> get_south_pole() const;

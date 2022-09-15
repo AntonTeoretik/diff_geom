@@ -25,7 +25,7 @@ std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index new
 template<std::size_t N>
 std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double eps) const
 {
-    if(v == Vec<N>{0.0,0.0}) return {{0.0,0.0}};
+    if(v == Vec<N>::zero()) return {Vec<N>::zero()};
     auto norm = v.norm();
     auto nv = v.nomalized();
     auto p = pt.p;
@@ -39,6 +39,7 @@ std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, 
     return {};
 }
 
+template class Manifold<1>;
 template class Manifold<2>;
 template class Manifold<3>;
 
@@ -47,10 +48,17 @@ template<std::size_t N>
 Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, index i) const
 {
     //Try to define next point in this domain.
-
+    std::cout << "DoOneStep? " << i << std::endl;
     Vec<N> curv;
-    for (size_t l = 0; l < N; l++)
+    for (size_t l = 0; l < N; l++) {
+        auto krMat = metric[i].kristMatrix(l, now);
+
+        std::cout << krMat.to_str() << std::endl;
+
         curv[l] = (now - prev) * (metric[i].kristMatrix(l, now) * (now - prev));
+        std::cout << "DoOneStep? " << i << " " << l << std::endl;
+    }
+
 
     auto next = now * 2 - prev - curv;
 
@@ -74,13 +82,17 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
     Point<N> prev = pt.p;
     Point<N> now = prev + (dir * step); // Possible trouble here
     Point<N> next;
+    std::cout << "Hey" << std::endl;
 
     std::vector<genPoint<N> > res = {pt, {pt.i, now}};
 
     index cur_index = pt.i;
 
     for (size_t i = 0; i < num_of_pts; i++) {
+
         next = doOneStep(prev, now, cur_index);
+
+        std::cout << "Hey: " << i << std::endl;
 
         // next is in current domain
         if(this->atlas[cur_index](next)) {
@@ -113,6 +125,7 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
 }
 
 
+template class RiemannianManifold<1>;
 template class RiemannianManifold<2>;
 template class RiemannianManifold<3>;
 

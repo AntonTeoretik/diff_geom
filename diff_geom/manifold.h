@@ -59,7 +59,7 @@ public:
 template <std::size_t N>
 class RiemannianManifold : public Manifold<N>
 {
-protected:
+public:
     std::vector<MetricTensor<N>> metric;
     Point<N> doOneStep(Point<N> prev, Point<N> now, index i) const;
 

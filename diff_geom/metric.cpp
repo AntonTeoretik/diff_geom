@@ -67,12 +67,14 @@ double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, Point
 template<std::size_t N>
 Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, Point<N> p) const
 {
+    std::cout << "Krist? " << p.to_str() << std::endl;
     return Matrix2D<N>([this, l, p](auto i, auto j){return this->krist(l, i, j, p);});
 }
 
 
-template class MetricTensor<3>;
+template class MetricTensor<1>;
 template class MetricTensor<2>;
+template class MetricTensor<3>;
 
 
 template<std::size_t N>
@@ -117,9 +119,14 @@ InducedMetricTensor<N, M>::InducedMetricTensor(std::function<Point<M> (Point<N>)
 
         if(alpha1 * alpha2 == 0) return 0.0; // Almost impossible, but anyway
 
+        std::cout << v1.to_str() << "; " << v2.to_str() << std::endl;
+
         Vec<M> dv1 = this->f(p + v1.nomalized() * this->pres) - this->f(p - v1.nomalized() * this->pres);
         Vec<M> dv2 = this->f(p + v2.nomalized() * this->pres) - this->f(p - v2.nomalized() * this->pres);
-        return 0.5 * alpha1 * alpha2 * (dv1 * dv2) / this->pres;
+
+        std::cout << dv1.to_str() << "; " << dv2.to_str() << "; " << this->pres << std::endl;
+        std::cout << alpha1 << "; " << alpha2 << ";" << dv1 * dv2 << "; " << this->pres << std::endl;
+        return 0.25 * alpha1 * alpha2 * (dv1 * dv2) / (this->pres * this->pres);
     };
 }
 
@@ -129,6 +136,7 @@ Point<M> InducedMetricTensor<N, M>::apply_generator(Point<N> p) const
     return f(p);
 }
 
+template class InducedMetricTensor<1,2>;
 template class InducedMetricTensor<2,3>;
 template class InducedMetricTensor<3,4>;
 template class InducedMetricTensor<2,2>;

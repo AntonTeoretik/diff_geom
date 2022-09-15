@@ -5,6 +5,7 @@ using namespace std;
 #include "algebra.h"
 #include "metric.h"
 #include "manifold.h"
+#include "ellipsoid.h"
 
 #include <fstream>
 
@@ -65,11 +66,24 @@ int main()
                                 MetricTensor<2>()
                             } );
 
-    std::vector<genPoint<2>> geo = m.geodesic({0, {0.9, 0}}, {1.0, 0}, 200);
+    std::cout << "Hi" << std::endl;
+    Sphere<2> S;
+    //std::cout << S.metric[0]({0,0}, {{1.0, 0.0}, {0.0, 1.0}}) << std::endl;
 
-    for(auto gpt : geo) {
-        std::cout << gpt.i << ", " << gpt.p.to_str() << std::endl;
-    }
+
+
+    //auto met = InducedMetricTensor<2,3>(S.proj_north_plane_to_sphere, 0.001);
+    //auto met = S.metric[0];
+    std::cout << S.metric.size() << std::endl;
+
+//    std::cout << "Hi" << std::endl;
+
+//    std::vector<genPoint<2>> geo = S.geodesic({0, {0,0}}, {1.0, 0}, 200, 0.0001);
+//    std::cout << "Hi" << std::endl;
+
+//    for(auto gpt : geo) {
+//        std::cout << gpt.i << ", " << gpt.p.to_str() << std::endl;
+//    }
 
 
     return 0;

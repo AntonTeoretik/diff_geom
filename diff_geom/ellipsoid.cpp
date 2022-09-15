@@ -87,5 +87,15 @@ Sphere<N>::Sphere(double controlConst) :
     };
 }
 
+template<std::size_t N>
+std::optional<Point<N+1>> Sphere<N>::immerse(genPoint<N> pt) const
+{
+    if(pt.i == 0) return {proj_north_plane_to_sphere(pt.p)};
+    if(pt.i == 1) return {proj_south_plane_to_sphere(pt.p)};
+    return {};
+}
+
+
+template class Sphere<1>;
 template class Sphere<2>;
 template class Sphere<3>;
