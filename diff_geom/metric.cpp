@@ -119,7 +119,8 @@ InducedMetricTensor<N, M>::InducedMetricTensor(std::function<Point<M> (Point<N>)
 
         if(alpha1 * alpha2 == 0) return 0.0; // Almost impossible, but anyway
 
-        std::cout << v1.to_str() << "; " << v2.to_str() << std::endl;
+        std::cout << "Induced metric: " <<  v1.to_str() << "; " << v2.to_str() << std::endl;
+        std::cout << this->f(p).to_str() << std::endl;
 
         Vec<M> dv1 = this->f(p + v1.nomalized() * this->pres) - this->f(p - v1.nomalized() * this->pres);
         Vec<M> dv2 = this->f(p + v2.nomalized() * this->pres) - this->f(p - v2.nomalized() * this->pres);

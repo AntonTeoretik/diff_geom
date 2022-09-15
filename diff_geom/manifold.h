@@ -44,7 +44,7 @@ using typedGraph = std::map<std::pair<index, index>, T>;
 template <std::size_t N>
 class Manifold
 {
-protected:
+public:
     std::vector<Chart<N>> atlas;
     index atlas_size;
     typedGraph<structMap<N>> structureMaps;

@@ -65,7 +65,7 @@ Sphere<N>::Sphere(double controlConst) :
     s_proj_to_plane = [](Point<N+1> p1){
         if (p1[0] == 1) return Point<N>::zero();
 
-        double t = 2.0 / (p1[0] - 1.0);
+        double t = -2.0 / (p1[0] - 1.0);
 
         Point<N> res;
         for(size_t i = 0; i < N; i++) {
@@ -76,14 +76,23 @@ Sphere<N>::Sphere(double controlConst) :
     // Structure maps
 
     this->structureMaps = {
-        {{0,1}, [this](Point<N> p){return p[0] == 0.0 ? std::nullopt : std::make_optional( s_proj_to_plane(proj_north_plane_to_sphere(p)) );} },
-        {{1,0}, [this](Point<N> p){return p[0] == 0.0 ? std::nullopt : std::make_optional( n_proj_to_plane(proj_south_plane_to_sphere(p)) );} }
+        {{0,1},
+         [this](Point<N> p){
+             return (p == Point<N>::zero()) ?
+             std::nullopt :
+             std::make_optional( s_proj_to_plane(proj_north_plane_to_sphere(p)) );} },
+
+        {{1,0},
+         [this](Point<N> p){
+             return (p == Point<N>::zero()) ?
+             std::nullopt :
+             std::make_optional( n_proj_to_plane(proj_south_plane_to_sphere(p)) );} }
     };
 
     // Metric
     this->metric = {
-        InducedMetricTensor<N, N+1>(proj_north_plane_to_sphere),
-        InducedMetricTensor<N, N+1>(proj_south_plane_to_sphere)
+        InducedMetricTensor<N, N+1>(this->proj_north_plane_to_sphere),
+        InducedMetricTensor<N, N+1>(this->proj_south_plane_to_sphere)
     };
 }
 
