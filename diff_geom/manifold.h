@@ -5,7 +5,9 @@
 #include <optional>
 #include <algebra.h>
 
+
 #include <vector>
+#include <memory>
 #include <map>
 
 #include "metric.h"
@@ -60,13 +62,13 @@ template <std::size_t N>
 class RiemannianManifold : public Manifold<N>
 {
 public:
-    std::vector<MetricTensor<N>> metric;
+    std::vector<std::shared_ptr<MetricTensor<N>>> metric; //TODO
     Point<N> doOneStep(Point<N> prev, Point<N> now, index i) const;
 
 public:
     RiemannianManifold(const std::vector<Chart<N>>& atlas,
                        const typedGraph<structMap<N>>& structureMaps,
-                       const std::vector<MetricTensor<N>>& metric);
+                       const std::vector<std::shared_ptr<MetricTensor<N>>>& metric);
 
     //pt must be not in the boundary of domain
     std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step=time_step) const;

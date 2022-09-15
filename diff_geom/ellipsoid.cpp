@@ -91,8 +91,8 @@ Sphere<N>::Sphere(double controlConst) :
 
     // Metric
     this->metric = {
-        InducedMetricTensor<N, N+1>(this->proj_north_plane_to_sphere),
-        InducedMetricTensor<N, N+1>(this->proj_south_plane_to_sphere)
+        std::make_shared<InducedMetricTensor<N, N+1>>(this->proj_north_plane_to_sphere),
+        std::make_shared<InducedMetricTensor<N, N+1>>(this->proj_south_plane_to_sphere)
     };
 }
 

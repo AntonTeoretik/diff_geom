@@ -48,15 +48,10 @@ template<std::size_t N>
 Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, index i) const
 {
     //Try to define next point in this domain.
-    std::cout << "DoOneStep? " << i << std::endl;
+
     Vec<N> curv;
     for (size_t l = 0; l < N; l++) {
-        auto krMat = metric[i].kristMatrix(l, now);
-
-        std::cout << krMat.to_str() << std::endl;
-
-        curv[l] = (now - prev) * (metric[i].kristMatrix(l, now) * (now - prev));
-        std::cout << "DoOneStep? " << i << " " << l << std::endl;
+        curv[l] = (now - prev) * (metric[i]->kristMatrix(l, now) * (now - prev));
     }
 
 
@@ -69,7 +64,7 @@ Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, index i) 
 template<std::size_t N>
 RiemannianManifold<N>::RiemannianManifold(const std::vector<Chart<N> > &atlas,
                                           const typedGraph<structMap<N> > &structureMaps,
-                                          const std::vector<MetricTensor<N> > &metric) :
+                                          const std::vector<std::shared_ptr<MetricTensor<N> > > &metric) :
     Manifold<N>(atlas, structureMaps),
     metric(metric)
 {
@@ -82,7 +77,7 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
     Point<N> prev = pt.p;
     Point<N> now = prev + (dir * step); // Possible trouble here
     Point<N> next;
-    std::cout << "Hey" << std::endl;
+
 
     std::vector<genPoint<N> > res = {pt, {pt.i, now}};
 
@@ -92,7 +87,7 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
 
         next = doOneStep(prev, now, cur_index);
 
-        std::cout << "Hey: " << i << std::endl;
+
 
         // next is in current domain
         if(this->atlas[cur_index](next)) {
@@ -102,11 +97,13 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
             continue;
         }
         // next point is outside -> need to change domain.
+
         for(index new_index = 0; new_index < this->atlas_size; new_index++) {
             if (std::optional<Point<N>> alt_prev_op = this->changePointIndex({cur_index, prev}, new_index),
                                         alt_now_op  = this->changePointIndex({cur_index, now}, new_index);
                 alt_prev_op.has_value() and alt_now_op.has_value())
             {
+
                 auto alt_next = doOneStep(alt_prev_op.value(), alt_now_op.value(), new_index);
                 // Everything is good
                 if(this->atlas[new_index](alt_next)) {
@@ -118,7 +115,9 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
                     break;
                 }
             }
+
         }
+
         // This situation must be impossible!
     }
     return res;
