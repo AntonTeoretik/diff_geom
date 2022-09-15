@@ -8,7 +8,7 @@
 #include <vector>
 #include <map>
 
-#include "geometry.h"
+#include "metric.h"
 
 
 template <std::size_t N>
@@ -23,6 +23,13 @@ template <std::size_t N>
 struct genPoint {
     index i;
     Point<N> p;
+};
+
+template <std::size_t N>
+struct genPairOfPoints {
+    index i;
+    Point<N> p1;
+    Point<N> p2;
 };
 
 template <class T>
@@ -45,7 +52,7 @@ protected:
 public:
     Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps);
 
-    std::optional<genPoint<N>> changePointIndex(genPoint<N> pt, index newIndex);
+    std::optional<Point<N> > changePointIndex(genPoint<N> pt, index newIndex);
     std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double e=eps);
 };
 
@@ -54,11 +61,15 @@ class RiemannianManifold : public Manifold<N>
 {
 protected:
     std::vector<MetricTensor<N>> metric;
+    Point<N> doOneStep(Point<N> prev, Point<N> now, index i);
+
 public:
     RiemannianManifold(const std::vector<Chart<N>>& atlas,
-                       const std::vector<std::vector<structMap<N>>>& structureMaps,
+                       const typedGraph<structMap<N>>& structureMaps,
                        const std::vector<MetricTensor<N>>& metric);
 
+    //pt must be not in the boundary of domain
+    std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step=time_step);
 };
 
 

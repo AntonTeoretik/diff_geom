@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#ifndef METRIC_H
+#define METRIC_H
 
 #include <functional>
 #include <array>
@@ -34,7 +34,7 @@ public:
     virtual double getCoord(Point<N> P, std::size_t i, std::size_t j) const;
 
     double krist(std::size_t l, std::size_t j , std::size_t k, Point<N> p) const; // Returns Г^l_jk
-    Matrix2D<N> kristMatrix(std::size_t l, Point<N> p) const; // Returns Г^l_jk
+    Matrix2D<N> kristMatrix(std::size_t l, Point<N> p) const; // Returns Г^l_{jk}
 };
 
 template <std::size_t N, std::size_t M>
@@ -63,4 +63,4 @@ template<std::size_t N>
 std::vector<Point<N>> geodesic(const MetricTensor<N> &g, Point<N> start, Vec<N> vel, std::size_t steps_num, double dt = time_step);
 
 
-#endif // GEOMETRY_H
+#endif // METRIC_H

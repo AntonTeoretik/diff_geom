@@ -3,7 +3,7 @@
 using namespace std;
 
 #include "algebra.h"
-#include "geometry.h"
+#include "metric.h"
 #include "manifold.h"
 
 #include <fstream>
@@ -49,17 +49,17 @@ int main()
 */
 
     Chart<2> c0([](auto){return true;});
-    Chart<2> c1([](auto){return true;});
 
-    structMap<2> map01([](auto p){return std::optional<Point<2>>(p * p.norm());});
-    structMap<2> map10([](auto p){return std::optional<Point<2>>(p - Point<2>{0.1, 0.2});});
+    RiemannianManifold<2> m({c0},
+                            {}, {MetricTensor<2>()} );
 
-    Manifold<2> m({c0, c1},
-                  { {{0,1},  map01},
-                    {{1,0}, map10} } );
+    std::vector<genPoint<2>> geo = m.geodesic({0, {0,0}}, {0, 1}, 100);
 
-    auto gp = m.changeVectorIndex({1.0, 1.0}, {0, {0.0, 0.0}},1);
-    std::cout << gp.value().to_str() << std::endl;
+    for(auto gpt : geo) {
+        std::cout << gpt.i << ", " << gpt.p.to_str() << std::endl;
+    }
+
+
 
 
     return 0;
