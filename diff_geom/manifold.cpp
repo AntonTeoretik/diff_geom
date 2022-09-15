@@ -13,10 +13,14 @@ Manifold<N>::Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<struc
 template<std::size_t N>
 std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index newIndex) const
 {
+    std::cout << "changePointIndex: " << pt.i << " " << pt.p.to_str() << std::endl;
     if (newIndex >= atlas_size) return {};
+
+
+
     if (auto it = structureMaps.find({pt.i, newIndex}); it != structureMaps.end())
     {
-        if(auto p = (it->second)(pt.p); p) return { p.value() };
+        if(auto p = (it->second)(pt.p); p.has_value()) return { p.value() };
         return {};
     }
     return {};
@@ -97,27 +101,32 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
             continue;
         }
         // next point is outside -> need to change domain.
+        else {
+            std::cout << "Geodesic, try change index: " << cur_index << std::endl;
+            for(index new_index = 0; new_index < this->atlas_size; new_index++) {
+                std::cout << "Try new index: " << new_index << std::endl;
 
-        for(index new_index = 0; new_index < this->atlas_size; new_index++) {
-            if (std::optional<Point<N>> alt_prev_op = this->changePointIndex({cur_index, prev}, new_index),
-                                        alt_now_op  = this->changePointIndex({cur_index, now}, new_index);
-                alt_prev_op.has_value() and alt_now_op.has_value())
-            {
+                if (std::optional<Point<N>> alt_prev_op = this->changePointIndex({cur_index, prev}, new_index),
+                                            alt_now_op  = this->changePointIndex({cur_index, now}, new_index);
+                    alt_prev_op.has_value() and alt_now_op.has_value())
+                {
 
-                auto alt_next = doOneStep(alt_prev_op.value(), alt_now_op.value(), new_index);
-                // Everything is good
-                if(this->atlas[new_index](alt_next)) {
-                    prev = alt_now_op.value();
-                    now = alt_next;
-                    cur_index = new_index;
+                    auto alt_next = doOneStep(alt_prev_op.value(), alt_now_op.value(), new_index);
+                    // Everything is good
+                    if(this->atlas[new_index](alt_next)) {
+                        prev = alt_now_op.value();
+                        now = alt_next;
 
-                    res.push_back({cur_index, now});
-                    break;
+
+                        cur_index = new_index;
+
+
+                        res.push_back({cur_index, now});
+                        break;
+                    }
                 }
             }
-
         }
-
         // This situation must be impossible!
     }
     return res;

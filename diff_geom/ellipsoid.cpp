@@ -22,6 +22,7 @@ Sphere<N>::Sphere(double controlConst) :
     // Atlas
     Chart<N> open_circle = [controlConst](Point<N> p){return (p.norm() < controlConst);};
     this->atlas = {open_circle, open_circle};
+    this->atlas_size = 2;
 
     // Projections
     proj_north_plane_to_sphere = [this](Point<N> p){
@@ -73,8 +74,8 @@ Sphere<N>::Sphere(double controlConst) :
         }
         return res;
     };
-    // Structure maps
 
+    // Structure maps
     this->structureMaps = {
         {{0,1},
          [this](Point<N> p){
