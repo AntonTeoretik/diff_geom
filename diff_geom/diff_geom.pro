@@ -7,6 +7,7 @@ SOURCES += \
         algebra.cpp \
         color.cpp \
         ellipsoid.cpp \
+        graphics.cpp \
         main.cpp \
         manifold.cpp \
         metric.cpp
@@ -16,5 +17,6 @@ HEADERS += \
     color.h \
     constants.h \
     ellipsoid.h \
+    graphics.h \
     manifold.h \
     metric.h

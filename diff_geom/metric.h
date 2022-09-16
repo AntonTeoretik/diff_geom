@@ -36,7 +36,7 @@ public:
     double krist(std::size_t l, std::size_t j , std::size_t k, Point<N> p) const; // Returns Г^l_jk
     Matrix2D<N> kristMatrix(std::size_t l, Point<N> p) const; // Returns Г^l_{jk}
 
-    std::vector<Vec<N>> orthogonalize(Point<N> pt, const std::vector<Vec<N> > &vecs, bool normalize  =true) const;
+    std::vector<Vec<N>> orthogonalize(Point<N> pt, const std::vector<Vec<N> > &vecs, bool normalize=true) const;
 };
 
 template <std::size_t N, std::size_t M>

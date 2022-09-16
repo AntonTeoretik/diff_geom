@@ -66,7 +66,7 @@ public:
 
     //pt must be not in the boundary of domain
     std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, size_t dist = 1, double step=time_step) const;
-    std::vector<Vec<N>> orthogonalize(genPoint<N> pt, const std::vector<Vec<N> > &vecs, bool normalize = true);
+    std::vector<Vec<N>> orthogonalize(genPoint<N> pt, const std::vector<Vec<N> > &vecs, bool normalize = true) const;
 };
 
 
