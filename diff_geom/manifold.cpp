@@ -13,7 +13,7 @@ Manifold<N>::Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<struc
 template<std::size_t N>
 std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index newIndex) const
 {
-    std::cout << "changePointIndex: " << pt.i << " " << pt.p.to_str() << std::endl;
+    //std::cout << "changePointIndex: " << pt.i << " " << pt.p.to_str() << std::endl;
     if (newIndex >= atlas_size) return {};
 
 
@@ -76,18 +76,22 @@ RiemannianManifold<N>::RiemannianManifold(const std::vector<Chart<N> > &atlas,
 }
 
 template<std::size_t N>
-std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step) const
+std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, size_t dist, double step) const
 {
     Point<N> prev = pt.p;
     Point<N> now = prev + (dir * step); // Possible trouble here
     Point<N> next;
 
+    size_t count = 1;
 
-    std::vector<genPoint<N> > res = {pt, {pt.i, now}};
+    std::vector<genPoint<N> > res = {pt};
+    if (dist == 1)
+        res.push_back({pt.i, now});
 
     index cur_index = pt.i;
 
     for (size_t i = 0; i < num_of_pts; i++) {
+        count++;
 
         next = doOneStep(prev, now, cur_index);
 
@@ -97,15 +101,18 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
         if(this->atlas[cur_index](next)) {
             prev = now;
             now = next;
-            res.push_back({cur_index, now});
+
+            if (count == dist) {
+                count = 0;
+                res.push_back({cur_index, now});
+            }
+            //std::cout << cur_index << ": " << now.to_str() << std::endl;
             continue;
         }
         // next point is outside -> need to change domain.
         else {
-            std::cout << "Geodesic, try change index: " << cur_index << std::endl;
+            bool change_failed = true;
             for(index new_index = 0; new_index < this->atlas_size; new_index++) {
-                std::cout << "Try new index: " << new_index << std::endl;
-
                 if (std::optional<Point<N>> alt_prev_op = this->changePointIndex({cur_index, prev}, new_index),
                                             alt_now_op  = this->changePointIndex({cur_index, now}, new_index);
                     alt_prev_op.has_value() and alt_now_op.has_value())
@@ -117,14 +124,21 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
                         prev = alt_now_op.value();
                         now = alt_next;
 
-
                         cur_index = new_index;
 
+                        if (count == dist) {
+                            count = 0;
 
-                        res.push_back({cur_index, now});
+                            res.push_back({cur_index, now});
+                        }
+
+                        change_failed = false;
                         break;
                     }
                 }
+            }
+            if(change_failed) {
+                std::cout << "Failed to change the index: cur_index = " << cur_index << ": " << now.to_str() << ", " << next.to_str()  << std::endl;
             }
         }
         // This situation must be impossible!

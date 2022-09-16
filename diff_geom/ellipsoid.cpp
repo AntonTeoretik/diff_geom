@@ -35,7 +35,7 @@ Sphere<N>::Sphere(double controlConst) :
         Vec<N+1> a_pp = pp - this->south_pole;
         double t = 4 / a_pp.norm2();
 
-        return this->south_pole + a_pp * t;
+        return (this->south_pole + (a_pp * t));
     };
 
     proj_south_plane_to_sphere = [this](Point<N> p){
@@ -48,7 +48,7 @@ Sphere<N>::Sphere(double controlConst) :
         Vec<N+1> a_pp = pp - this->north_pole;
         double t = 4 / a_pp.norm2();
 
-        return this->north_pole + a_pp * t;
+        return (this->north_pole + (a_pp * t));
     };
 
     n_proj_to_plane = [](Point<N+1> p1){

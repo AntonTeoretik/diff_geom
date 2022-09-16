@@ -71,7 +71,7 @@ public:
                        const std::vector<std::shared_ptr<MetricTensor<N>>>& metric);
 
     //pt must be not in the boundary of domain
-    std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, double step=time_step) const;
+    std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, size_t dist = 1, double step=time_step) const;
 };
 
 
