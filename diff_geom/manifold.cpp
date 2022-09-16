@@ -31,7 +31,7 @@ std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, 
 {
     if(v == Vec<N>::zero()) return {Vec<N>::zero()};
     auto norm = v.norm();
-    auto nv = v.nomalized();
+    auto nv = v.normalized();
     auto p = pt.p;
 
     if( auto pp_next = changePointIndex({pt.i, p + nv * eps}, newIndex),
@@ -144,6 +144,12 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
         // This situation must be impossible!
     }
     return res;
+}
+
+template<std::size_t N>
+std::vector<Vec<N> > RiemannianManifold<N>::orthogonalize(genPoint<N> pt, const std::vector<Vec<N> > &vecs, bool normalize) const
+{
+    return this->metric[pt.i]->orthogonalize(pt.p, vecs, normalize);
 }
 
 

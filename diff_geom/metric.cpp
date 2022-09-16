@@ -70,6 +70,25 @@ Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, Point<N> p) const
     return Matrix2D<N>([this, l, p](auto i, auto j){return this->krist(l, i, j, p);});
 }
 
+template<std::size_t N>
+std::vector<Vec<N> > MetricTensor<N>::orthogonalize(Point<N> pt, const std::vector<Vec<N> >& vecs, bool norm) const
+{
+    std::vector<Vec<N> > res = {};
+    for(size_t i = 0; i < vecs.size(); i++) {
+        Vec<N> vec = vecs[i];
+        for(size_t j = 0; j < res.size(); j++) {
+            vec = vec - res[j] * (g(pt, vecs[i], res[j]) / g(pt, res[j], res[j]) );
+        }
+        res.push_back(vec);
+    }
+    if (norm) {
+        for(auto& v : res) {
+            v = v.normalized();
+        }
+    }
+    return res;
+}
+
 
 template class MetricTensor<1>;
 template class MetricTensor<2>;
@@ -119,8 +138,8 @@ InducedMetricTensor<N, M>::InducedMetricTensor(std::function<Point<M> (Point<N>)
         if(alpha1 * alpha2 == 0) return 0.0; // Almost impossible, but anyway
 
 
-        Vec<M> dv1 = this->f(p + v1.nomalized() * this->pres) - this->f(p - v1.nomalized() * this->pres);
-        Vec<M> dv2 = this->f(p + v2.nomalized() * this->pres) - this->f(p - v2.nomalized() * this->pres);
+        Vec<M> dv1 = this->f(p + v1.normalized() * this->pres) - this->f(p - v1.normalized() * this->pres);
+        Vec<M> dv2 = this->f(p + v2.normalized() * this->pres) - this->f(p - v2.normalized() * this->pres);
 
         return 0.25 * alpha1 * alpha2 * (dv1 * dv2) / (this->pres * this->pres);
     };

@@ -24,7 +24,7 @@ public:
     double norm2() const;
     double norm() const;
 
-    Vec<N> nomalized() const;
+    Vec<N> normalized() const;
 
     static Vec<N> zero();
 };

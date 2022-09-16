@@ -62,7 +62,7 @@ double Vec<N>::norm() const
 }
 
 template<std::size_t N>
-Vec<N> Vec<N>::nomalized() const
+Vec<N> Vec<N>::normalized() const
 {
     return (*this) * (1 / norm());
 }
