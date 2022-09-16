@@ -159,9 +159,11 @@ T integrateAlongPath(const std::vector<genPoint<N> > &points,
                      double step)
 {
     double current_time = 0.0;
-    T res;
+    T res = {};
     //first value
-    if(points.size() == 0) return res;
+    if(points.size() == 0) {
+        return res;
+    }
     res = func(points[0]) * (step * weight(current_time));
 
     for(size_t i = 1; i <= points.size(); i++) {
@@ -171,19 +173,19 @@ T integrateAlongPath(const std::vector<genPoint<N> > &points,
     return res;
 }
 
-template<>
+template
 double integrateAlongPath(const std::vector<genPoint<3> > &,
                           const std::function<double (genPoint<3>)>,
                           const std::function<double (double)>,
                           double);
 
-template<>
+template
 double integrateAlongPath(const std::vector<genPoint<2> > &,
                           const std::function<double (genPoint<2>)>,
                           const std::function<double (double)>,
                           double);
 
-template<>
+template
 Vec<3> integrateAlongPath(const std::vector<genPoint<3> > &,
                           const std::function<Vec<3> (genPoint<3>)>,
                           const std::function<double (double)>,
