@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
         algebra.cpp \
+        color.cpp \
         ellipsoid.cpp \
         main.cpp \
         manifold.cpp \
@@ -12,6 +13,7 @@ SOURCES += \
 
 HEADERS += \
     algebra.h \
+    color.h \
     constants.h \
     ellipsoid.h \
     manifold.h \

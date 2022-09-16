@@ -85,8 +85,10 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
     size_t count = 1;
 
     std::vector<genPoint<N> > res = {pt};
-    if (dist == 1)
+    if (dist == 1) {
         res.push_back({pt.i, now});
+        count = 0;
+    }
 
     index cur_index = pt.i;
 
@@ -94,8 +96,6 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
         count++;
 
         next = doOneStep(prev, now, cur_index);
-
-
 
         // next is in current domain
         if(this->atlas[cur_index](next)) {
@@ -151,3 +151,40 @@ template class RiemannianManifold<1>;
 template class RiemannianManifold<2>;
 template class RiemannianManifold<3>;
 
+
+template<class T, std::size_t N>
+T integrateAlongPath(const std::vector<genPoint<N> > &points,
+                     const std::function<T (genPoint<N>)> func,
+                     const std::function<double (double)> weight,
+                     double step)
+{
+    double current_time = 0.0;
+    T res;
+    //first value
+    if(points.size() == 0) return res;
+    res = func(points[0]) * (step * weight(current_time));
+
+    for(size_t i = 1; i <= points.size(); i++) {
+        current_time += step;
+        res = res + func(points[0]) * (step * weight(current_time));
+    }
+    return res;
+}
+
+template<>
+double integrateAlongPath(const std::vector<genPoint<3> > &,
+                          const std::function<double (genPoint<3>)>,
+                          const std::function<double (double)>,
+                          double);
+
+template<>
+double integrateAlongPath(const std::vector<genPoint<2> > &,
+                          const std::function<double (genPoint<2>)>,
+                          const std::function<double (double)>,
+                          double);
+
+template<>
+Vec<3> integrateAlongPath(const std::vector<genPoint<3> > &,
+                          const std::function<Vec<3> (genPoint<3>)>,
+                          const std::function<double (double)>,
+                          double);

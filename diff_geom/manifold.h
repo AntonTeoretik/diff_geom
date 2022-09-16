@@ -27,12 +27,6 @@ struct genPoint {
     Point<N> p;
 };
 
-template <std::size_t N>
-struct genPairOfPoints {
-    index i;
-    Point<N> p1;
-    Point<N> p2;
-};
 
 template <class T>
 using typedGraph = std::map<std::pair<index, index>, T>;
@@ -73,6 +67,13 @@ public:
     //pt must be not in the boundary of domain
     std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, size_t dist = 1, double step=time_step) const;
 };
+
+
+template <class T, std::size_t N>
+T integrateAlongPath(const std::vector<genPoint<N>>& points,
+                     const std::function<T(genPoint<N>)> func,
+                     const std::function<double(double)> weight=[](double){return 1.0;},
+                     double step=time_step);
 
 
 #endif // MANIFOLD_H

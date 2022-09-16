@@ -22,13 +22,13 @@ z = points['z'].values
 
 ax.plot(x, y, z, color="red")
 
-# surface
-X = np.arange(-0.7, 0.7, 0.05)
-Y = np.arange(-0.7, 0.7, 0.05)
-X, Y = np.meshgrid(X, Y)
-R = (1 - X**2 - Y**2)**(1/2)
+# # surface
+# X = np.arange(-0.7, 0.7, 0.05)
+# Y = np.arange(-0.7, 0.7, 0.05)
+# X, Y = np.meshgrid(X, Y)
+# R = (1 - X**2 - Y**2)**(1/2)
 
-ax.plot_surface(X, Y, R, linewidth=0, antialiased=False, alpha=0.3, color = "green")
+# ax.plot_surface(X, Y, R, linewidth=0, antialiased=False, alpha=0.3, color = "green")
 
 
 plt.show()
