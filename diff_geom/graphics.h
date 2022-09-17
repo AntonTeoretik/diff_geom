@@ -2,7 +2,7 @@
 #define GRAPHICS_H
 
 #include "manifold.h"
-
+#include "bitimage/bitmap_image.hpp"
 
 struct Screen
 {
@@ -30,6 +30,9 @@ public:
     Renderer(const RiemannianManifold<3>& manifold, genPoint<3> basePt);
     void setBasePoint(genPoint<3> newBasePoint);
     void setBasis(Vec<3> x_axe_, Vec<3> y_axe_, Vec<3> z_axe_);
+
+
+
 };
 
 #endif // GRAPHICS_H

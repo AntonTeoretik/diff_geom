@@ -14,6 +14,7 @@ SOURCES += \
 
 HEADERS += \
     algebra.h \
+    bitimage/bitmap_image.hpp \
     color.h \
     constants.h \
     ellipsoid.h \
