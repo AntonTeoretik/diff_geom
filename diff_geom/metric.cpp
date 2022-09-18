@@ -66,7 +66,20 @@ double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, Point
 template<std::size_t N>
 Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, Point<N>& p) const
 {
-    return Matrix2D<N>([this, l, &p](auto i, auto j){return this->krist(l, i, j, p);});
+    Matrix2D<N> res;
+    for (size_t i = 1; i < N; i++) {
+        for (size_t j = 0; j < i; j++) {
+            double kr = krist(l, i, j, p);
+            res[i][j] = kr;
+            res[j][i] = kr;
+        }
+    }
+    for (size_t i = 0; i < N; i++) {
+        res[i][i] = this->krist(l, i, i, p);
+    }
+
+    //return Matrix2D<N>([this, l, &p](auto i, auto j){return this->krist(l, i, j, p);});
+    return res;
 }
 
 template<std::size_t N>
