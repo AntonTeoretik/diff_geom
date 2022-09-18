@@ -33,7 +33,7 @@ public:
     virtual Matrix2D<N> getMatrix(Point<N>& P) const;
     virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j) const;
 
-    double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p) const; // Returns Г^l_jk
+    virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p) const; // Returns Г^l_jk
     Matrix2D<N> kristMatrix(std::size_t l, Point<N>& p) const; // Returns Г^l_{jk}
 
     std::vector<Vec<N>> orthogonalize(Point<N>& pt, const std::vector<Vec<N> > &vecs, bool normalize=true) const;
@@ -49,7 +49,7 @@ protected:
 
 public:
     InducedMetricTensor<N, M>(std::function<Point<M>(const Point<N>&)>, double pres=eps);
-    double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p) const; // Returns Г^l_jk
+    virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p) const; // Returns Г^l_jk
     virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j) const;
 
     Point<M> apply_generator(const Point<N>&) const;

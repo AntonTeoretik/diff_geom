@@ -19,7 +19,7 @@ int main()
 
     Renderer rend(S, {0, {0,0,0}});
 
-    rend.number_of_points = 1000;
+    rend.number_of_points = 100;
     rend.step = 0.01;
     rend.screen.h_resolution = 1;
     rend.screen.w_resolution = 10;
