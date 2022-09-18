@@ -17,7 +17,7 @@ public:
     Color();
     Color(Vec<3>);
 
-    rgb_t toRB() const;
+    rgb_t toRGB() const;
 
 };
 

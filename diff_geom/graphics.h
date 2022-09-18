@@ -24,7 +24,7 @@ class Renderer
            y_axe = {0.0, 1.0, 0.0},
            z_axe = {0.0, 0.0, 1.0};
 
-    rgb_t trace_one_pixel(const std::function<Vec<3>(genPoint<3>)>& func, size_t x, size_t y) const;
+    Vec<3> trace_one_pixel(const std::function<Vec<3>(genPoint<3>)>& func, size_t x, size_t y) const;
 
 public:
     std::function<double(double)> weight = [](auto){return 1.0;};

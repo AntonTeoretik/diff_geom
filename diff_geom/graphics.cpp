@@ -8,12 +8,11 @@ Vec<3> Screen::lookAtPixel(size_t x, size_t y) const
     return Vec<3>{real_x, real_y, distance_to_screen}.normalized();
 }
 
-rgb_t Renderer::trace_one_pixel(const std::function<Vec<3> (genPoint<3>)>& func, size_t x, size_t y) const
+Vec<3> Renderer::trace_one_pixel(const std::function<Vec<3> (genPoint<3>)>& func, size_t x, size_t y) const
 {
     Vec<3> v = this->screen.lookAtPixel(x, y);
-    auto path = this->manifold.geodesic(basePoint, v, number_of_points, dist, step);
-    Vec<3> integr = integrateAlongPath(path, func, weight, step);
-    return Color(integr).toRB();
+    return this->manifold.integrateAlongPath(basePoint, v, number_of_points,
+                                                 func, weight, step);
 }
 
 Renderer::Renderer(const RiemannianManifold<3> &manifold, genPoint<3> pt) : manifold(manifold), basePoint(pt)
@@ -37,13 +36,23 @@ void Renderer::setBasis(Vec<3> x_axe_, Vec<3> y_axe_, Vec<3> z_axe_)
 bitmap_image Renderer::render(const std::function<Vec<3> (genPoint<3>)> &func)
 {
     bitmap_image img(screen.w_resolution, screen.h_resolution);
+
+    std::vector<std::vector<Vec<3>>> table_of_integrals(screen.w_resolution);
+
     for(size_t x = 0; x < screen.w_resolution; x++) {
         for(size_t y = 0; y < screen.h_resolution; y++) {
             std::cout << x << " " << y << std::endl;
-            rgb_t res = trace_one_pixel(func, x, y);
-            std::cout << int(res.red) << " " << int(res.green) << " " << int(res.blue) <<std::endl;
-            img.set_pixel(x, y, trace_one_pixel(func, x, y));
+            Vec<3> res = trace_one_pixel(func, x, y);
+            table_of_integrals[x].push_back(res);
         }
     }
+
+    for(size_t x = 0; x < screen.w_resolution; x++) {
+        for(size_t y = 0; y < screen.h_resolution; y++) {
+            img.set_pixel(x, y, Color(table_of_integrals[x][y]).toRGB());
+        }
+    }
+
+
     return img;
 }

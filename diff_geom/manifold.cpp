@@ -168,7 +168,7 @@ T integrateAlongPath(const std::vector<genPoint<N> > &points,
 
     for(size_t i = 1; i <= points.size(); i++) {
         current_time += step;
-        res = res + func(points[0]) * (step * weight(current_time));
+        res = res + func(points[i]) * (step * weight(current_time));
     }
     return res;
 }
@@ -200,5 +200,29 @@ T RiemannianManifold<N>::integrateAlongPath(genPoint<N> start,
                                           const std::function<double (double)> &weight,
                                           double step) const
 {
+    double current_time = 0.0;
 
+    Point<N> prev = start.p;
+    Point<N> now = prev + (dir * step); // Possible trouble here
+    chart_index cur_index = start.i;
+
+    T res = func({cur_index, now}) * weight(0.0) * step;
+
+    for(size_t i = 1; i <= num_of_pts; i++) {
+        current_time += step;
+        doOneStepWithChange(prev, now, cur_index);
+        res = res + func({cur_index, now}) * (step * weight(current_time));
+    }
+    return res;
 }
+
+
+
+template
+Vec<3> RiemannianManifold<3>::integrateAlongPath<Vec<3>>(genPoint<3> start,
+                                          Vec<3> dir,
+                                          size_t num_of_pts,
+                                          const std::function<Vec<3>(genPoint<3>)> &func,
+                                          const std::function<double (double)> &weight,
+                                          double step) const;
+

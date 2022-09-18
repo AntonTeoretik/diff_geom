@@ -22,7 +22,7 @@ Color::Color(Vec<3> v)
     b = std::min(v[2] + 0.5 * (glow_green + glow_red), 1.0);
 }
 
-rgb_t Color::toRB() const
+rgb_t Color::toRGB() const
 {
     return {(unsigned char)(this->r * 255),
             (unsigned char)(this->g * 255),
