@@ -21,3 +21,8 @@ HEADERS += \
     graphics.h \
     manifold.h \
     metric.h
+
+QMAKE_CXXFLAGS_RELEASE -= -O
+QMAKE_CXXFLAGS_RELEASE -= -O1
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS += -O3

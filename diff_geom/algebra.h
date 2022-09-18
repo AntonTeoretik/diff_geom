@@ -63,4 +63,6 @@ std::array<Vec<N>, N> basis = []() {
 }();
 
 
+
+
 #endif // ALGEBRA_H
