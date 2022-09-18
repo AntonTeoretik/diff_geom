@@ -11,7 +11,7 @@ Manifold<N>::Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<struc
 }
 
 template<std::size_t N>
-std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index newIndex) const
+std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, chart_index newIndex) const
 {
     //std::cout << "changePointIndex: " << pt.i << " " << pt.p.to_str() << std::endl;
     if (newIndex >= atlas_size) return {};
@@ -27,7 +27,7 @@ std::optional<Point<N> > Manifold<N>::changePointIndex(genPoint<N> pt, index new
 }
 
 template<std::size_t N>
-std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double eps) const
+std::optional<Vec<N> > Manifold<N>::changeVectorIndex(Vec<N> v, genPoint<N> pt, chart_index newIndex, double eps) const
 {
     if(v == Vec<N>::zero()) return {Vec<N>::zero()};
     auto norm = v.norm();
@@ -49,7 +49,7 @@ template class Manifold<3>;
 
 
 template<std::size_t N>
-Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, index i) const
+Point<N> RiemannianManifold<N>::doOneStep(Point<N> prev, Point<N> now, chart_index i) const
 {
     //Try to define next point in this domain.
 
@@ -90,7 +90,7 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
         count = 0;
     }
 
-    index cur_index = pt.i;
+    chart_index cur_index = pt.i;
 
     for (size_t i = 0; i < num_of_pts; i++) {
         count++;
@@ -112,7 +112,7 @@ std::vector<genPoint<N> > RiemannianManifold<N>::geodesic(genPoint<N> pt, Vec<N>
         // next point is outside -> need to change domain.
         else {
             bool change_failed = true;
-            for(index new_index = 0; new_index < this->atlas_size; new_index++) {
+            for(chart_index new_index = 0; new_index < this->atlas_size; new_index++) {
                 if (std::optional<Point<N>> alt_prev_op = this->changePointIndex({cur_index, prev}, new_index),
                                             alt_now_op  = this->changePointIndex({cur_index, now}, new_index);
                     alt_prev_op.has_value() and alt_now_op.has_value())

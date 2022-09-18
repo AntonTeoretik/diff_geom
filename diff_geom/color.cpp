@@ -1,10 +1,6 @@
 #include "color.h"
 
-double Color::glow(double x)
-{
-    if (x < 0.0) return 0.0;
-    return (1.0 - 1.0 / (x+1.0));
-}
+
 
 Color::Color()
 {
@@ -24,4 +20,11 @@ Color::Color(Vec<3> v)
     r = std::min(v[0] + 0.5 * (glow_green + glow_blue), 1.0);
     g = std::min(v[1] + 0.5 * (glow_red + glow_blue), 1.0);
     b = std::min(v[2] + 0.5 * (glow_green + glow_red), 1.0);
+}
+
+rgb_t Color::toRB() const
+{
+    return {(unsigned char)(this->r * 255),
+            (unsigned char)(this->g * 255),
+            (unsigned char)(this->b * 255)};
 }

@@ -19,17 +19,17 @@ using Chart = std::function<bool(Point<N>)>;
 template <std::size_t N>
 using structMap = std::function<std::optional<Point<N>>(Point<N>)>;
 
-using index = std::size_t;
+using chart_index = std::size_t;
 
 template <std::size_t N>
 struct genPoint {
-    index i;
+    chart_index i;
     Point<N> p;
 };
 
 
 template <class T>
-using typedGraph = std::map<std::pair<index, index>, T>;
+using typedGraph = std::map<std::pair<chart_index, chart_index>, T>;
 
 /**
  * @brief Manifold = Charts + structure maps.
@@ -42,14 +42,14 @@ class Manifold
 {
 public:
     std::vector<Chart<N>> atlas;
-    index atlas_size;
+    chart_index atlas_size;
     typedGraph<structMap<N>> structureMaps;
 
 public:
     Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps);
 
-    std::optional<Point<N> > changePointIndex(genPoint<N> pt, index newIndex) const;
-    std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, index newIndex, double e=eps) const;
+    std::optional<Point<N> > changePointIndex(genPoint<N> pt, chart_index newIndex) const;
+    std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, chart_index newIndex, double e=eps) const;
 };
 
 template <std::size_t N>
@@ -57,7 +57,7 @@ class RiemannianManifold : public Manifold<N>
 {
 public:
     std::vector<std::shared_ptr<MetricTensor<N>>> metric; //TODO
-    Point<N> doOneStep(Point<N> prev, Point<N> now, index i) const;
+    Point<N> doOneStep(Point<N> prev, Point<N> now, chart_index i) const;
 
 public:
     RiemannianManifold(const std::vector<Chart<N>>& atlas,
