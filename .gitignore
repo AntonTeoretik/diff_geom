@@ -1,3 +1,4 @@
 build* 
 diff_geom/*.user
 *.csv
+*.bmp
