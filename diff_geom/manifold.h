@@ -58,6 +58,7 @@ class RiemannianManifold : public Manifold<N>
 public:
     std::vector<std::shared_ptr<MetricTensor<N>>> metric; //TODO
     Point<N> doOneStep(Point<N> prev, Point<N> now, chart_index i) const;
+    void doOneStepWithChange(Point<N>& prev, Point<N>& now, chart_index& i) const;
 
 public:
     RiemannianManifold(const std::vector<Chart<N>>& atlas,
@@ -67,13 +68,22 @@ public:
     //pt must be not in the boundary of domain
     std::vector<genPoint<N>> geodesic(genPoint<N> pt, Vec<N> dir, size_t num_of_pts, size_t dist = 1, double step=time_step) const;
     std::vector<Vec<N>> orthogonalize(genPoint<N> pt, const std::vector<Vec<N> > &vecs, bool normalize = true) const;
+
+    // Same as geodesic, but do integration without saving the path.
+    template <class T>
+    T integrateAlongPath(genPoint<N> start,
+                     Vec<N> dir,
+                     size_t num_of_pts,
+                     const std::function<T(genPoint<N>)>& func,
+                     const std::function<double(double)>& weight=[](double){return 1.0;},
+                     double step=time_step) const;
 };
 
 
 template <class T, std::size_t N>
 T integrateAlongPath(const std::vector<genPoint<N>>& points,
-                     const std::function<T(genPoint<N>)> func,
-                     const std::function<double(double)> weight=[](double){return 1.0;},
+                     const std::function<T(genPoint<N>)>& func,
+                     const std::function<double(double)>& weight=[](double){return 1.0;},
                      double step=time_step);
 
 
