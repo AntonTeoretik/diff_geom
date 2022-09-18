@@ -19,10 +19,10 @@ int main()
 
     Renderer rend(S, {0, {0,0,0}});
 
-    rend.number_of_points = 100;
+    rend.number_of_points = 1000;
     rend.step = 0.01;
-    //rend.screen.h_resolution = 2;
-    //rend.screen.w_resolution = 2;
+    rend.screen.h_resolution = 1;
+    rend.screen.w_resolution = 10;
 
     bitmap_image img = rend.render([](auto){return Vec<3>{1.0,1.0,1.0};});
     img.save_image("../img.bmp");

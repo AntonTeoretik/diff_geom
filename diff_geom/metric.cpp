@@ -189,15 +189,8 @@ double InducedMetricTensor<N, M>::dk_gij(Point<N> &pt, size_t k, size_t i, size_
     vec_mxj_mxk = f(pt);
     pt[j] = pt_j; pt[k] = pt_k;
 
-    double subres1 = vec_pxi_pxk * vec_pxj_pxk -
-                     vec_pxi_pxk * vec_mxj_pxk -
-                     vec_mxi_pxk * vec_pxj_pxk +
-                     vec_mxi_pxk * vec_mxj_pxk;
-
-    double subres2 = vec_pxi_mxk * vec_pxj_mxk -
-                     vec_pxi_mxk * vec_mxj_mxk -
-                     vec_mxi_mxk * vec_pxj_mxk +
-                     vec_mxi_mxk * vec_mxj_mxk;
+    double subres1 = (vec_pxi_pxk - vec_mxi_pxk) * (vec_pxj_pxk - vec_mxj_pxk);
+    double subres2 = (vec_pxi_mxk - vec_mxi_mxk) * (vec_pxj_mxk - vec_mxj_mxk);
 
     return 0.125 / pres * (subres1 - subres2) / pres / pres;
 }
@@ -250,10 +243,12 @@ double InducedMetricTensor<N, M>::getCoord(Point<N> &pt, std::size_t i, std::siz
     vec_mxj = f(pt);
     pt[j] = pt_j;
 
-    double subres = vec_pxi * vec_pxj -
-                    vec_pxi * vec_mxj -
-                    vec_mxi * vec_pxj +
-                    vec_mxi * vec_mxj;
+    double subres = (vec_pxi - vec_mxi) * (vec_pxj - vec_mxj);
+
+//    double subres = vec_pxi * vec_pxj -
+//                    vec_pxi * vec_mxj -
+//                    vec_mxi * vec_pxj +
+//                    vec_mxi * vec_mxj;
 
     return 0.25 * subres / pres / pres;
 }

@@ -3,13 +3,13 @@
 
 #include <iostream>
 #include <optional>
-#include <algebra.h>
 
 
 #include <vector>
 #include <memory>
 #include <map>
 
+#include "algebra.h"
 #include "metric.h"
 
 
