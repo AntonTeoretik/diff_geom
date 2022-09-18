@@ -25,7 +25,7 @@ Sphere<N>::Sphere(double controlConst) :
     this->atlas_size = 2;
 
     // Projections
-    proj_north_plane_to_sphere = [this](Point<N> p){
+    proj_north_plane_to_sphere = [this](const Point<N>& p){
         Point<N+1> pp;
         for(size_t i = 1; i < N+1; i++) {
             pp[i] = p[i-1];
@@ -38,7 +38,7 @@ Sphere<N>::Sphere(double controlConst) :
         return (this->south_pole + (a_pp * t));
     };
 
-    proj_south_plane_to_sphere = [this](Point<N> p){
+    proj_south_plane_to_sphere = [this](const Point<N>& p){
         Point<N+1> pp;
         for(size_t i = 1; i < N+1; i++) {
             pp[i] = p[i-1];
@@ -51,7 +51,7 @@ Sphere<N>::Sphere(double controlConst) :
         return (this->north_pole + (a_pp * t));
     };
 
-    n_proj_to_plane = [](Point<N+1> p1){
+    n_proj_to_plane = [](const Point<N+1>& p1){
         if (p1[0] == -1) return Point<N>::zero();
 
         double t = 2.0 / (p1[0] + 1.0);
@@ -63,7 +63,7 @@ Sphere<N>::Sphere(double controlConst) :
         return res;
     };
 
-    s_proj_to_plane = [](Point<N+1> p1){
+    s_proj_to_plane = [](const Point<N+1>& p1){
         if (p1[0] == 1) return Point<N>::zero();
 
         double t = -2.0 / (p1[0] - 1.0);

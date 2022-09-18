@@ -17,11 +17,11 @@ public:
     Point<N+1> north_pole;
     Point<N+1> south_pole;
 
-    std::function<Point<N+1>(Point<N>)> proj_north_plane_to_sphere;
-    std::function<Point<N+1>(Point<N>)> proj_south_plane_to_sphere;
+    std::function<Point<N+1>(const Point<N>&)> proj_north_plane_to_sphere;
+    std::function<Point<N+1>(const Point<N>&)> proj_south_plane_to_sphere;
 
-    std::function<Point<N>(Point<N+1>)> n_proj_to_plane;
-    std::function<Point<N>(Point<N+1>)> s_proj_to_plane;
+    std::function<Point<N>(const Point<N+1>&)> n_proj_to_plane;
+    std::function<Point<N>(const Point<N+1>&)> s_proj_to_plane;
 
     structMap<N> up_to_down, down_to_up;
 
