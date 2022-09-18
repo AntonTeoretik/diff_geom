@@ -37,7 +37,7 @@ double MetricTensor<N>::operator()(Point<N>& p, Vec<N>& vec1, Vec<N>& vec2) cons
 template<std::size_t N>
 Matrix2D<N> MetricTensor<N>::getMatrix(Point<N>& P) const
 {
-    return Matrix2D<N>([this, &P](int i, int j){return this->g(P, basis<N>[i], basis<N>[j]); });
+    return Matrix2D<N>([this, &P](int i, int j){return this->getCoord(P, i, j); });
 }
 
 template<std::size_t N>
@@ -199,7 +199,7 @@ double InducedMetricTensor<N, M>::dk_gij(Point<N> &pt, size_t k, size_t i, size_
                      vec_mxi_mxk * vec_pxj_mxk +
                      vec_mxi_mxk * vec_mxj_mxk;
 
-    return 0.125 / (pres * pres * pres) * (subres1 - subres2);
+    return 0.125 / pres * (subres1 - subres2) / pres / pres;
 }
 
 template<std::size_t N, std::size_t M>
@@ -207,7 +207,14 @@ double InducedMetricTensor<N, M>::krist(std::size_t l, std::size_t j, std::size_
 {
     double res = 0;
 
-    Matrix2D<N> MgInv = MetricTensor<N>::getMatrix(p).inverse();
+    Matrix2D<N> Mg;
+    for(size_t i = 0; i < N; i++) {
+        for(size_t j = 0; j < N; j++) {
+            Mg[i][j] = getCoord(p, i, j);
+        }
+    }
+    //Matrix2D<N> MgInv = MetricTensor<N>::getMatrix(p).inverse();
+    Matrix2D<N> MgInv = Mg.inverse();
 
     for(std::size_t r = 0; r < N; r++) {
         double dk_grj = dk_gij(p, k, r, j);
@@ -218,6 +225,39 @@ double InducedMetricTensor<N, M>::krist(std::size_t l, std::size_t j, std::size_
     }
     return res * 0.5;
 }
+
+template<std::size_t N, std::size_t M>
+double InducedMetricTensor<N, M>::getCoord(Point<N> &pt, std::size_t i, std::size_t j) const
+{
+    double pt_i = pt[i];
+    double pt_j = pt[j];
+
+    Vec<M> vec_pxi, vec_mxi, vec_pxj, vec_mxj;
+
+    pt[i] += pres;
+    vec_pxi = f(pt);
+    pt[i] = pt_i;
+
+    pt[i] -= pres;
+    vec_mxi = f(pt);
+    pt[i] = pt_i;
+
+    pt[j] += pres;
+    vec_pxj = f(pt);
+    pt[j] = pt_j;
+
+    pt[j] -= pres;
+    vec_mxj = f(pt);
+    pt[j] = pt_j;
+
+    double subres = vec_pxi * vec_pxj -
+                    vec_pxi * vec_mxj -
+                    vec_mxi * vec_pxj +
+                    vec_mxi * vec_mxj;
+
+    return 0.25 * subres / pres / pres;
+}
+
 
 template<std::size_t N, std::size_t M>
 Point<M> InducedMetricTensor<N, M>::apply_generator(const Point<N> &p) const

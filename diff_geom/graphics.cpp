@@ -41,10 +41,10 @@ bitmap_image Renderer::render(const std::function<Vec<3> (genPoint<3>)> &func)
 
     for(size_t x = 0; x < screen.w_resolution; x++) {
         for(size_t y = 0; y < screen.h_resolution; y++) {
-            std::cout << x << " " << y << std::endl;
             Vec<3> res = trace_one_pixel(func, x, y);
             table_of_integrals[x].push_back(res);
         }
+        std::cout << x << std::endl;
     }
 
     for(size_t x = 0; x < screen.w_resolution; x++) {
