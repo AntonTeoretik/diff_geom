@@ -30,11 +30,11 @@ public:
     virtual double operator() (Point<N>&, std::array<Vec<N>, 2>&) const;
     virtual double operator() (Point<N>&, Vec<N>&, Vec<N>&) const;
 
-    virtual Matrix2D<N> getMatrix(Point<N>& P) const;
-    virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j) const;
+    virtual Matrix2D<N> getMatrix(Point<N>& P);
+    virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j);
 
-    virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p) const; // Returns Г^l_jk
-    Matrix2D<N> kristMatrix(std::size_t l, Point<N>& p) const; // Returns Г^l_{jk}
+    virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p); // Returns Г^l_jk
+    Matrix2D<N> kristMatrix(std::size_t l, Point<N>& p); // Returns Г^l_{jk}
 
     std::vector<Vec<N>> orthogonalize(Point<N>& pt, const std::vector<Vec<N> > &vecs, bool normalize=true) const;
 };
@@ -43,16 +43,20 @@ template <std::size_t N, std::size_t M>
 class InducedMetricTensor : public MetricTensor<N>
 {
 protected:
-    std::function<Point<M>(const Point<N>&)> f;
-    double dk_gij(Point<N>& pt, size_t k, size_t r, size_t j) const;
+    std::function<void(const Point<N>&, Point<M>&)> f;
+    //std::function<Point<M>(const Point<N>&)> f;
+    double dk_gij(Point<N>& pt, size_t k, size_t r, size_t j);
     double pres;
 
-public:
-    InducedMetricTensor<N, M>(std::function<Point<M>(const Point<N>&)>, double pres=eps);
-    virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p) const; // Returns Г^l_jk
-    virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j) const;
+    Vec<M> vec_pxi_pxk, vec_mxi_pxk, vec_pxj_pxk, vec_mxj_pxk,
+           vec_pxi_mxk, vec_mxi_mxk, vec_pxj_mxk, vec_mxj_mxk;
+    Vec<M> dv1p, dv1m, dv2p, dv2m;
+    Vec<M> vec_pxi, vec_mxi, vec_pxj, vec_mxj;
 
-    Point<M> apply_generator(const Point<N>&) const;
+public:
+    InducedMetricTensor<N, M>(std::function<void(const Point<N>&, Point<M>&)>, double pres=eps);
+    virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p); // Returns Г^l_jk
+    virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j);
 };
 
 

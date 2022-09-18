@@ -25,8 +25,7 @@ Sphere<N>::Sphere(double controlConst) :
     this->atlas_size = 2;
 
     // Projections
-    proj_north_plane_to_sphere = [this](const Point<N>& p){
-        Point<N+1> pp;
+    proj_north_plane_to_sphere = [this](const Point<N>& p, Point<N+1>& pp){
         for(size_t i = 1; i < N+1; i++) {
             pp[i] = p[i-1];
         }
@@ -35,11 +34,10 @@ Sphere<N>::Sphere(double controlConst) :
         Vec<N+1> a_pp = pp - this->south_pole;
         double t = 4 / a_pp.norm2();
 
-        return (this->south_pole + (a_pp * t));
+        pp = (this->south_pole + (a_pp * t));
     };
 
-    proj_south_plane_to_sphere = [this](const Point<N>& p){
-        Point<N+1> pp;
+    proj_south_plane_to_sphere = [this](const Point<N>& p, Point<N+1>& pp){
         for(size_t i = 1; i < N+1; i++) {
             pp[i] = p[i-1];
         }
@@ -48,46 +46,59 @@ Sphere<N>::Sphere(double controlConst) :
         Vec<N+1> a_pp = pp - this->north_pole;
         double t = 4 / a_pp.norm2();
 
-        return (this->north_pole + (a_pp * t));
+        pp = this->north_pole + (a_pp * t);
     };
 
-    n_proj_to_plane = [](const Point<N+1>& p1){
-        if (p1[0] == -1) return Point<N>::zero();
+    n_proj_to_plane = [](const Point<N+1>& p1, Point<N>& res){
+        if (p1[0] == -1) {
+            res = Point<N>::zero();
+            return;
+        }
 
         double t = 2.0 / (p1[0] + 1.0);
 
-        Point<N> res;
         for(size_t i = 0; i < N; i++) {
             res[i] = t * p1[i+1];
         }
-        return res;
     };
 
-    s_proj_to_plane = [](const Point<N+1>& p1){
-        if (p1[0] == 1) return Point<N>::zero();
-
+    s_proj_to_plane = [](const Point<N+1>& p1, Point<N>& res){
+        if (p1[0] == 1) {
+            res = Point<N>::zero();
+            return;
+        }
         double t = -2.0 / (p1[0] - 1.0);
-
-        Point<N> res;
         for(size_t i = 0; i < N; i++) {
             res[i] = t * p1[i+1];
         }
-        return res;
     };
 
     // Structure maps
     this->structureMaps = {
         {{0,1},
          [this](Point<N> p){
-             return (p == Point<N>::zero()) ?
-             std::nullopt :
-             std::make_optional( s_proj_to_plane(proj_north_plane_to_sphere(p)) );} },
+             if (p == Point<N>::zero()) {
+                 return std::optional<Point<N>>{};
+             }
+             Point<N+1> pp;
+             proj_north_plane_to_sphere(p, pp);
+             s_proj_to_plane(pp, p);
+             return std::make_optional<Point<N>>(p);
+         }
+        },
 
         {{1,0},
          [this](Point<N> p){
-             return (p == Point<N>::zero()) ?
-             std::nullopt :
-             std::make_optional( n_proj_to_plane(proj_south_plane_to_sphere(p)) );} }
+
+             if (p == Point<N>::zero()) {
+                 return std::optional<Point<N>>{};
+             }
+             Point<N+1> pp;
+             proj_south_plane_to_sphere(p, pp);
+             n_proj_to_plane(pp, p);
+             return std::make_optional<Point<N>>(p);
+            }
+         }
     };
 
     // Metric
@@ -97,13 +108,6 @@ Sphere<N>::Sphere(double controlConst) :
     };
 }
 
-template<std::size_t N>
-std::optional<Point<N+1>> Sphere<N>::immerse(genPoint<N> pt) const
-{
-    if(pt.i == 0) return {proj_north_plane_to_sphere(pt.p)};
-    if(pt.i == 1) return {proj_south_plane_to_sphere(pt.p)};
-    return {};
-}
 
 
 template class Sphere<1>;
