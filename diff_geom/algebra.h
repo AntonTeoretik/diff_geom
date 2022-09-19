@@ -26,8 +26,11 @@ public:
 
     Vec<N> normalized() const;
 
+    void normalize();
+
     void addWithScale(const Vec<N>& v, double scale);
     void subtract(const Vec<N>& v);
+    void scale(double a);
 
     static Vec<N> zero();
 };

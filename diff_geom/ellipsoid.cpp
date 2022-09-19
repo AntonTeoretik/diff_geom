@@ -9,10 +9,13 @@ void proj_north_plane_to_sphere(const Point<N> & p, Point<N+1> & pp)
     }
 
     pp[0] = 1; // Upper plane!
-    Vec<N+1> a_pp = pp - south_pole<N>;
-    double t = 4 / a_pp.norm2();
+    Vec<N+1> a_pp = pp;
+    a_pp[0] += 1;
 
-    pp = (south_pole<N> + (a_pp * t));
+    double t = 4.0 / a_pp.norm2();
+    a_pp.scale(t);
+    pp = a_pp;
+    pp[0] -= 1;
 }
 
 template<std::size_t N>
@@ -21,12 +24,15 @@ void proj_south_plane_to_sphere(const Point<N> & p, Point<N+1> & pp)
     for(size_t i = 1; i < N+1; i++) {
         pp[i] = p[i-1];
     }
-
     pp[0] = -1; // Down plane!
-    Vec<N+1> a_pp = pp - north_pole<N>;
-    double t = 4 / a_pp.norm2();
 
-    pp = north_pole<N> + (a_pp * t);
+    Vec<N+1> a_pp = pp;
+
+    a_pp[0] -= 1;
+    double t = 4.0 / a_pp.norm2();
+    a_pp.scale(t);
+    pp = a_pp;
+    pp[0] += 1;
 }
 
 template<std::size_t N>
