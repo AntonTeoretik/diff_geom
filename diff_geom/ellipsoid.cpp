@@ -44,37 +44,11 @@ Sphere<N>::Sphere(double controlConst) :
     this->atlas = {open_circle, open_circle};
     this->atlas_size = 2;
 
-    // Projections
-
-
-    n_proj_to_plane = [](const Point<N+1>& p1, Point<N>& res){
-        if (p1[0] == -1) {
-            res = Point<N>::zero();
-            return;
-        }
-
-        double t = 2.0 / (p1[0] + 1.0);
-
-        for(size_t i = 0; i < N; i++) {
-            res[i] = t * p1[i+1];
-        }
-    };
-
-    s_proj_to_plane = [](const Point<N+1>& p1, Point<N>& res){
-        if (p1[0] == 1) {
-            res = Point<N>::zero();
-            return;
-        }
-        double t = -2.0 / (p1[0] - 1.0);
-        for(size_t i = 0; i < N; i++) {
-            res[i] = t * p1[i+1];
-        }
-    };
 
     // Structure maps
     this->structureMaps = {
         {{0,1},
-         [this](Point<N> p){
+         [](Point<N> p){
              if (p == Point<N>::zero()) {
                  return std::optional<Point<N>>{};
              }
@@ -86,7 +60,7 @@ Sphere<N>::Sphere(double controlConst) :
         },
 
         {{1,0},
-         [this](Point<N> p){
+         [](Point<N> p){
 
              if (p == Point<N>::zero()) {
                  return std::optional<Point<N>>{};
@@ -106,7 +80,38 @@ Sphere<N>::Sphere(double controlConst) :
     };
 }
 
+template<size_t N>
+void s_proj_to_plane(const Point<N+1> & p1, Point<N> & res)
+{
+    if (p1[0] == 1) {
+        res = Point<N>::zero();
+        return;
+    }
+    double t = -2.0 / (p1[0] - 1.0);
+    for(size_t i = 0; i < N; i++) {
+        res[i] = t * p1[i+1];
+    }
+}
+
+template<size_t N>
+void n_proj_to_plane(const Point<N+1> & p1, Point<N> & res)
+{
+    if (p1[0] == -1) {
+        res = Point<N>::zero();
+        return;
+    }
+
+    double t = 2.0 / (p1[0] + 1.0);
+
+    for(size_t i = 0; i < N; i++) {
+        res[i] = t * p1[i+1];
+    }
+}
+
+
+
 template class Sphere<1>;
 template class Sphere<2>;
 template class Sphere<3>;
+
 

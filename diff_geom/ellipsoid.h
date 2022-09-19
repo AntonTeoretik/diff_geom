@@ -19,15 +19,18 @@ template<std::size_t N>
 class Sphere : public RiemannianManifold<N>
 {
 public:
-    std::function<void(const Point<N+1>&, Point<N>&)> n_proj_to_plane;
-    std::function<void(const Point<N+1>&, Point<N>&)> s_proj_to_plane;
-
     structMap<N> up_to_down, down_to_up;
 
 public:
     Sphere(double controlConst = 3.0);
 
 };
+
+template <size_t N>
+void n_proj_to_plane(const Point<N+1>&, Point<N>&);
+
+template <size_t N>
+void s_proj_to_plane(const Point<N+1>&, Point<N>&);
 
 template <size_t N>
 void proj_north_plane_to_sphere (const Point<N>&, Point<N+1>&);
