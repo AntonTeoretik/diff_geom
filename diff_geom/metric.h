@@ -43,10 +43,12 @@ template <std::size_t N, std::size_t M>
 class InducedMetricTensor : public MetricTensor<N>
 {
 protected:
-    std::function<void(const Point<N>&, Point<M>&)> f;
+    void (*f)(const Point<N>&, Point<M>&);
+    //std::function<void(const Point<N>&, Point<M>&)> f;
     //std::function<Point<M>(const Point<N>&)> f;
+
     double dk_gij(Point<N>& pt, size_t k, size_t r, size_t j);
-    double pres;
+    double pres, inv_pres2, inv_pres3;
 
     Vec<M> vec_pxi_pxk, vec_mxi_pxk, vec_pxj_pxk, vec_mxj_pxk,
            vec_pxi_mxk, vec_mxi_mxk, vec_pxj_mxk, vec_mxj_mxk;
@@ -54,7 +56,8 @@ protected:
     Vec<M> vec_pxi, vec_mxi, vec_pxj, vec_mxj;
 
 public:
-    InducedMetricTensor<N, M>(std::function<void(const Point<N>&, Point<M>&)>, double pres=eps);
+    //InducedMetricTensor<N, M>(std::function<void(const Point<N>&, Point<M>&)>, double pres=eps);
+    InducedMetricTensor<N, M>(void(*f)(const Point<N>&, Point<M>&), double pres=eps);
     virtual double krist(std::size_t l, std::size_t j , std::size_t k, Point<N>& p); // Returns Г^l_jk
     virtual double getCoord(Point<N>& P, std::size_t i, std::size_t j);
 };

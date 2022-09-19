@@ -4,6 +4,11 @@
 #include "algebra.h"
 #include "manifold.h"
 
+template<std::size_t N>
+Point<N+1> north_pole = basis<N+1>[0];
+
+template<std::size_t N>
+Point<N+1> south_pole = Point<N+1>::zero() - basis<N+1>[0];
 
 ///
 /// \brief The Sphere class
@@ -14,12 +19,6 @@ template<std::size_t N>
 class Sphere : public RiemannianManifold<N>
 {
 public:
-    Point<N+1> north_pole;
-    Point<N+1> south_pole;
-
-    std::function<void(const Point<N>&, Point<N+1>&)> proj_north_plane_to_sphere;
-    std::function<void(const Point<N>&, Point<N+1>&)> proj_south_plane_to_sphere;
-
     std::function<void(const Point<N+1>&, Point<N>&)> n_proj_to_plane;
     std::function<void(const Point<N+1>&, Point<N>&)> s_proj_to_plane;
 
@@ -28,10 +27,13 @@ public:
 public:
     Sphere(double controlConst = 3.0);
 
-    Point<N+1> get_north_pole() const;
-    Point<N+1> get_south_pole() const;
 };
 
+template <size_t N>
+void proj_north_plane_to_sphere (const Point<N>&, Point<N+1>&);
+
+template <size_t N>
+void proj_south_plane_to_sphere (const Point<N>&, Point<N+1>&);
 
 
 

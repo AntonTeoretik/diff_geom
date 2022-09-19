@@ -26,6 +26,9 @@ public:
 
     Vec<N> normalized() const;
 
+    void addWithScale(const Vec<N>& v, double scale);
+    void subtract(const Vec<N>& v);
+
     static Vec<N> zero();
 };
 
@@ -50,6 +53,7 @@ public:
     std::string to_str() const;
 
 };
+
 
 template <std::size_t N>
 std::array<Vec<N>, N> basis = []() {

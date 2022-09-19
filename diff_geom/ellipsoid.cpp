@@ -1,53 +1,45 @@
 #include "ellipsoid.h"
 
+
 template<std::size_t N>
-Point<N+1> Sphere<N>::get_north_pole() const
+void proj_north_plane_to_sphere(const Point<N> & p, Point<N+1> & pp)
 {
-    return north_pole;
+    for(size_t i = 1; i < N+1; i++) {
+        pp[i] = p[i-1];
+    }
+
+    pp[0] = 1; // Upper plane!
+    Vec<N+1> a_pp = pp - south_pole<N>;
+    double t = 4 / a_pp.norm2();
+
+    pp = (south_pole<N> + (a_pp * t));
 }
 
 template<std::size_t N>
-Point<N+1> Sphere<N>::get_south_pole() const
+void proj_south_plane_to_sphere(const Point<N> & p, Point<N+1> & pp)
 {
-    return south_pole;
+    for(size_t i = 1; i < N+1; i++) {
+        pp[i] = p[i-1];
+    }
+
+    pp[0] = -1; // Down plane!
+    Vec<N+1> a_pp = pp - north_pole<N>;
+    double t = 4 / a_pp.norm2();
+
+    pp = north_pole<N> + (a_pp * t);
 }
 
 template<std::size_t N>
 Sphere<N>::Sphere(double controlConst) :
     RiemannianManifold<N>({}, {}, {})
 {
-    north_pole = Point<N+1>::zero(); north_pole[0] = 1;
-    south_pole = Point<N+1>::zero(); south_pole[0] = -1;
-
     // Atlas
     Chart<N> open_circle = [controlConst](Point<N> p){return (p.norm() < controlConst);};
     this->atlas = {open_circle, open_circle};
     this->atlas_size = 2;
 
     // Projections
-    proj_north_plane_to_sphere = [this](const Point<N>& p, Point<N+1>& pp){
-        for(size_t i = 1; i < N+1; i++) {
-            pp[i] = p[i-1];
-        }
 
-        pp[0] = 1; // Upper plane!
-        Vec<N+1> a_pp = pp - this->south_pole;
-        double t = 4 / a_pp.norm2();
-
-        pp = (this->south_pole + (a_pp * t));
-    };
-
-    proj_south_plane_to_sphere = [this](const Point<N>& p, Point<N+1>& pp){
-        for(size_t i = 1; i < N+1; i++) {
-            pp[i] = p[i-1];
-        }
-
-        pp[0] = -1; // Down plane!
-        Vec<N+1> a_pp = pp - this->north_pole;
-        double t = 4 / a_pp.norm2();
-
-        pp = this->north_pole + (a_pp * t);
-    };
 
     n_proj_to_plane = [](const Point<N+1>& p1, Point<N>& res){
         if (p1[0] == -1) {
@@ -103,13 +95,12 @@ Sphere<N>::Sphere(double controlConst) :
 
     // Metric
     this->metric = {
-        std::make_shared<InducedMetricTensor<N, N+1>>(this->proj_north_plane_to_sphere),
-        std::make_shared<InducedMetricTensor<N, N+1>>(this->proj_south_plane_to_sphere)
+        std::make_shared<InducedMetricTensor<N, N+1>>(proj_north_plane_to_sphere<N>),
+        std::make_shared<InducedMetricTensor<N, N+1>>(proj_south_plane_to_sphere<N>)
     };
 }
-
-
 
 template class Sphere<1>;
 template class Sphere<2>;
 template class Sphere<3>;
+

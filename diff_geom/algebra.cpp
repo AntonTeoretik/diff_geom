@@ -68,6 +68,20 @@ Vec<N> Vec<N>::normalized() const
 }
 
 template<std::size_t N>
+void Vec<N>::addWithScale(const Vec<N> &v, double scale)
+{
+    for(std::size_t i = 0; i < N; i++)
+        (*this)[i] += v[i] * scale;
+}
+
+template<std::size_t N>
+void Vec<N>::subtract(const Vec<N> &v)
+{
+    for(std::size_t i = 0; i < N; i++)
+        (*this)[i] -= v[i];
+}
+
+template<std::size_t N>
 Vec<N> Vec<N>::zero()
 {
     Vec<N> res;

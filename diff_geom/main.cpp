@@ -12,6 +12,9 @@ using namespace std;
 
 #include <array>
 
+
+
+
 int main()
 {
     double ts = 0.01;

@@ -138,15 +138,17 @@ template std::vector<Point<3> > geodesic(MetricTensor<3> &g, Point<3> start, Vec
 
 
 template<std::size_t N, std::size_t M>
-InducedMetricTensor<N, M>::InducedMetricTensor(std::function<void(const Point<N>&, Point<M>&)> f, double pres) : f(f), pres(pres)
+InducedMetricTensor<N, M>::InducedMetricTensor(void(*f)(const Point<N>&, Point<M>&), double pres) :
+    f(f),
+    pres(pres),
+    inv_pres2(0.25 / (pres * pres)),
+    inv_pres3(0.125 / (pres * pres * pres))
 {
     // This is ALMOST linear version
     this->g = [&, this](Point<N>& p, const Vec<N>& v1, const Vec<N>& v2)
     {
         double alpha1 = v1.norm();
         double alpha2 = v2.norm();
-
-
 
         if(alpha1 * alpha2 == 0) return 0.0; // Almost impossible, but anyway
 
@@ -200,10 +202,21 @@ double InducedMetricTensor<N, M>::dk_gij(Point<N> &pt, size_t k, size_t i, size_
     f(pt, vec_mxj_mxk);
     pt[j] = pt_j; pt[k] = pt_k;
 
+
+    vec_pxi_pxk.subtract(vec_mxi_pxk);
+    vec_pxj_pxk.subtract(vec_mxj_pxk);
+    vec_pxi_mxk.subtract(vec_mxi_mxk);
+    vec_pxj_mxk.subtract(vec_mxj_mxk);
+    double subres1 = vec_pxi_pxk * vec_pxj_pxk;
+    double subres2 = vec_pxi_mxk * vec_pxj_mxk;
+    /*
     double subres1 = (vec_pxi_pxk - vec_mxi_pxk) * (vec_pxj_pxk - vec_mxj_pxk);
     double subres2 = (vec_pxi_mxk - vec_mxi_mxk) * (vec_pxj_mxk - vec_mxj_mxk);
+    */
 
-    return 0.125 / pres * (subres1 - subres2) / pres / pres;
+
+
+    return (subres1 - subres2) * inv_pres3;
 }
 
 template<std::size_t N, std::size_t M>
@@ -254,14 +267,17 @@ double InducedMetricTensor<N, M>::getCoord(Point<N> &pt, std::size_t i, std::siz
     f(pt, vec_mxj);
     pt[j] = pt_j;
 
-    double subres = (vec_pxi - vec_mxi) * (vec_pxj - vec_mxj);
+    vec_pxi.subtract(vec_mxi);
+    vec_pxj.subtract(vec_mxj);
+    double subres = vec_pxi * vec_pxj;
+    //double subres = (vec_pxi - vec_mxi) * (vec_pxj - vec_mxj);
 
 //    double subres = vec_pxi * vec_pxj -
 //                    vec_pxi * vec_mxj -
 //                    vec_mxi * vec_pxj +
 //                    vec_mxi * vec_mxj;
 
-    return 0.25 * subres / pres / pres;
+    return subres * inv_pres2;
 }
 
 template class InducedMetricTensor<1,2>;
