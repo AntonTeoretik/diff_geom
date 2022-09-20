@@ -15,7 +15,8 @@ using namespace std;
 
 double closeness_to_int(double x) {
     double x1 = std::round(x);
-    return 2*(0.5 - abs(x1 - x));
+    x1 = abs(x1 - x);
+    return x1 <= 0.1 ? 2.0 : 0.0;
 }
 
 Vec<3> my_func(const genPoint<3>& p, const Sphere<3>& S) {
@@ -27,7 +28,7 @@ Vec<3> my_func(const genPoint<3>& p, const Sphere<3>& S) {
             return {0.0, 0.0, 0.0};
         pp = res.value();
     }
-    pp.scale(0.1);
+    //pp.scale(0.1);
 
     double x = closeness_to_int( pp[0] - 0.5);
     double y = closeness_to_int( pp[1] - 0.5);
@@ -39,17 +40,18 @@ Vec<3> my_func(const genPoint<3>& p, const Sphere<3>& S) {
 
 int main()
 {
-    double ts = 0.01;
     Sphere<3> S(3.0);
 
-    Renderer rend(S, {1, {0,0,0}});
+    Renderer rend(S, {0, {0,0,0}});
 
-    rend.number_of_points = 100;
-    rend.step = 0.05;
-    rend.screen.h_resolution = 200;
-    rend.screen.w_resolution = 200;
+    rend.number_of_points = 500;
+    rend.step = 0.01;
+    rend.screen.h_resolution = 50;
+    rend.screen.w_resolution = 50;
 
-    rend.weight = [](double x){return 1 / (x + 1);};
+    rend.setBasis({1,3,2}, {3,2,1}, {1, 0, 0});
+
+    rend.weight = [](double x){return 1.0 / (x + 1.0);};
 
     bitmap_image img = rend.render([&S](auto p){return my_func(p, S);});
     img.save_image("../img.bmp");
