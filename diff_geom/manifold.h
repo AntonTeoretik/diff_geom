@@ -45,6 +45,44 @@ using typedGraph = std::map<std::pair<chart_index, chart_index>, T>;
  * @
  */
 template <std::size_t N>
+class AbstractManifold
+{
+public:
+    virtual bool changePointIndex(genPoint<N>& pt, chart_index newIndex) const = 0;
+    virtual bool isPointValid(const genPoint<N>& pt) const = 0;
+};
+
+template <std::size_t N>
+class AbstractRiemannianManifold : public AbstractManifold<N>
+{
+public:
+    const MetricTensor<N>& getMetric(chart_index i) const = 0;
+
+    Point<N> doOneStep(Point<N> prev, Point<N> now, chart_index i) const;
+    void doOneStepWithChange(Point<N>& prev, Point<N>& now, chart_index& i) const;
+
+    std::vector<genPoint<N>> geodesic(const genPoint<N>& pt, Vec<N> dir, size_t num_of_pts, size_t dist = 1, double step=time_step) const;
+    std::vector<Vec<N>> orthogonalize(const genPoint<N>& pt, const std::vector<Vec<N> > &vecs, bool normalize = true) const;
+};
+
+
+template <std::size_t N, class T>
+class AbstractRiemannianManifoldWithFunction : public AbstractRiemannianManifold<N>
+{
+public:
+    double weight(double) const = 0;
+    T func(const genPoint<N>&);
+
+    T integrateAlongPath(genPoint<N> start,
+                     Vec<N> dir,
+                     size_t num_of_pts,
+                     const std::function<T(genPoint<N>)>& func,
+                     double step=time_step) const;
+};
+
+
+
+template <std::size_t N>
 class Manifold
 {
 public:
