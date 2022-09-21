@@ -14,10 +14,18 @@
 
 
 template <std::size_t N>
-using Chart = std::function<bool(Point<N>)>;
+class Chart
+{
+public:
+    bool operator ()(const Point<N>&) const = 0;
+};
 
 template <std::size_t N>
-using structMap = std::function<std::optional<Point<N>>(Point<N>)>;
+class Abstract_map
+{
+public:
+    std::optional<Point<N>> operator ()(const Point<N>&) const = 0;
+};
 
 using chart_index = std::size_t;
 
@@ -26,7 +34,6 @@ struct genPoint {
     chart_index i;
     Point<N> p;
 };
-
 
 template <class T>
 using typedGraph = std::map<std::pair<chart_index, chart_index>, T>;
@@ -43,10 +50,10 @@ class Manifold
 public:
     std::vector<Chart<N>> atlas;
     chart_index atlas_size;
-    typedGraph<structMap<N>> structureMaps;
+    typedGraph<Abstract_map<N>> structureMaps;
 
 public:
-    Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps);
+    Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<Abstract_map<N>>& structureMaps);
 
     std::optional<Point<N> > changePointIndex(genPoint<N> pt, chart_index newIndex) const;
     std::optional<Vec<N>> changeVectorIndex(Vec<N> v, genPoint<N> pt, chart_index newIndex, double e=eps) const;
@@ -62,7 +69,7 @@ public:
 
 public:
     RiemannianManifold(const std::vector<Chart<N>>& atlas,
-                       const typedGraph<structMap<N>>& structureMaps,
+                       const typedGraph<Abstract_map<N>>& structureMaps,
                        const std::vector<std::shared_ptr<MetricTensor<N>>>& metric);
 
     //pt must be not in the boundary of domain

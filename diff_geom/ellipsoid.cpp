@@ -108,8 +108,6 @@ void n_proj_to_plane(const Point<N+1> & p1, Point<N> & res)
     }
 }
 
-
-
 template class Sphere<1>;
 template class Sphere<2>;
 template class Sphere<3>;

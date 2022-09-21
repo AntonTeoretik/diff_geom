@@ -2,7 +2,7 @@
 
 
 template<std::size_t N>
-Manifold<N>::Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<structMap<N>>& structureMaps) :
+Manifold<N>::Manifold(const std::vector<Chart<N>>& atlas, const typedGraph<Abstract_map<N>>& structureMaps) :
     atlas(atlas),
     atlas_size(atlas.size()),
     structureMaps(structureMaps)
@@ -104,7 +104,7 @@ void RiemannianManifold<N>::doOneStepWithChange(Point<N> &prev, Point<N> &now, c
 
 template<std::size_t N>
 RiemannianManifold<N>::RiemannianManifold(const std::vector<Chart<N> > &atlas,
-                                          const typedGraph<structMap<N> > &structureMaps,
+                                          const typedGraph<Abstract_map<N> > &structureMaps,
                                           const std::vector<std::shared_ptr<MetricTensor<N> > > &metric) :
     Manifold<N>(atlas, structureMaps),
     metric(metric)
