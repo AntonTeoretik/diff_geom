@@ -4,46 +4,45 @@
 #include "algebra.h"
 #include "manifold.h"
 
-template<std::size_t N>
-Point<N+1> north_pole = basis<N+1>[0];
+enum PLAIN_POSITION {NORTH, SOUTH};
 
 template<std::size_t N>
-Point<N+1> south_pole = Point<N+1>::zero() - basis<N+1>[0];
-
-///
-/// \brief The Sphere class
-/// index 0 : North plane
-/// index 1 : South plane
-///
-template<std::size_t N>
-class Sphere : public RiemannianManifold<N>
+class Inversion : public diffeomorphism<N>
 {
+protected:
+    double radious2;
 public:
-    structMap<N> up_to_down, down_to_up;
-
-public:
-    Sphere(double controlConst = 3.0);
-
+    Inversion(double radious = 1.0) : radious2(radious*radious) {}
+    Point<N> operator ()(const Point<N> &);
 };
 
-template <size_t N>
-void n_proj_to_plane(const Point<N+1>&, Point<N>&);
-
-template <size_t N>
-void s_proj_to_plane(const Point<N+1>&, Point<N>&);
-
-template <size_t N>
-void proj_north_plane_to_sphere (const Point<N>&, Point<N+1>&);
-
-template <size_t N>
-void proj_south_plane_to_sphere (const Point<N>&, Point<N+1>&);
-
-
-
-class Ellipsoid
+template<std::size_t N>
+class EllipsoidMetric : public InducedMetricTensor<N, N+1>
 {
+protected:
+    double shift;
+    std::array<double, N+1> proportions;
 public:
-    Ellipsoid();
+    EllipsoidMetric(const std::array<double, N+1>& proportions, const PLAIN_POSITION pos);
+    Point<N+1> gen_func(const Point<N> &) const;
 };
+
+
+template<std::size_t N>
+class Ellipsoid : public AbstractRiemannianManifold<N>
+{
+protected:
+    double struct_const;
+    EllipsoidMetric<N> up_metric, down_metric;
+public:
+    Ellipsoid(std::array<double, N+1> proportions, double struct_const = 9.0);
+
+    // AbstractManifold interface
+public:
+    virtual bool changePointIndex(Point<N> &pt, chart_index oldIndex, chart_index newIndex) const;
+    virtual bool isPoint(const Point<N> &pt, chart_index i) const;
+    const MetricTensor<N>& getMetric(chart_index i) const;
+};
+
 
 #endif // ELLIPSOID_H

@@ -2,7 +2,7 @@
 #define CONSTANTS_H
 
 
-const double eps = 0.001;
+const double eps = 0.0001;
 const double time_step = 0.001;
 
 
