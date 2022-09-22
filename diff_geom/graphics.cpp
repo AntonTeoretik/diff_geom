@@ -57,11 +57,15 @@ bitmap_image Renderer::render()
     bitmap_image img(screen.w_resolution, screen.h_resolution);
 
     std::vector<std::vector<Vec<3>>> table_of_integrals(screen.w_resolution);
+    for(size_t x = 0; x < screen.w_resolution; x++) {
+        table_of_integrals[x].resize(screen.h_resolution);
+    }
 
+    #pragma omp parallel for
     for(size_t x = 0; x < screen.w_resolution; x++) {
         for(size_t y = 0; y < screen.h_resolution; y++) {
             Vec<3> res = trace_one_pixel(x, y);
-            table_of_integrals[x].push_back(res);
+            table_of_integrals[x][y] = res;
         }
         std::cout << x << std::endl;
     }

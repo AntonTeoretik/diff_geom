@@ -53,7 +53,7 @@ int main()
 
     Renderer rend(S, f, {0, {0,0,0}}, w);
 
-    rend.number_of_points = 100;
+    rend.number_of_points = 500;
     rend.step = 0.01;
     rend.screen.h_resolution = 50;
     rend.screen.w_resolution = 50;

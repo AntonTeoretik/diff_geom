@@ -4,6 +4,8 @@
 #include "manifold.h"
 #include "color.h"
 
+#include <omp.h>
+
 struct Screen
 {
     double distance_to_screen;
