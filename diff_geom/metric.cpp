@@ -76,7 +76,9 @@ std::vector<Vec<N> > MetricTensor<N>::orthogonalize(const Point<N>& pt, const st
     }
     if (norm) {
         for(auto& v : res) {
-            v = v.normalized();
+            //std::cout << "Scale: " << std::sqrt((*this)(pt, v, v)) << std::endl;
+            //std::cout << "v: " << v.to_str() << std::endl;
+            v.scale(1.0 / std::sqrt((*this)(pt, v, v)));
         }
     }
     return res;
@@ -94,7 +96,7 @@ InducedMetricTensor<N, M>::InducedMetricTensor(double pres) :
     inv_pres2(0.25 / (pres * pres)),
     inv_pres3(0.125 / (pres * pres * pres))
 {
-
+    //std::cout << pres << " " << inv_pres2 << " " << inv_pres3 << std::endl;
 }
 
 
@@ -121,7 +123,7 @@ double InducedMetricTensor<N, M>::operator()(const Point<N> & p, const Vec<N> & 
     dv1p.subtract(dv1m);
     dv2p.subtract(dv2m);
 
-    return alpha1 * alpha2 * (dv1p * dv2p) * inv_pres2;
+    return alpha1 * alpha2 * (dv1p * dv2p) * 0.25 / pres / pres;
 };
 
 template<std::size_t N, std::size_t M>
@@ -155,6 +157,7 @@ double InducedMetricTensor<N, M>::dk_gij(const Point<N> &p, size_t k, size_t i, 
 
     vec_pxi.subtract(vec_mxi);
     vec_pxj.subtract(vec_mxj);
+
     double subres1 = vec_pxi * vec_pxj;
 
 
@@ -179,7 +182,7 @@ double InducedMetricTensor<N, M>::dk_gij(const Point<N> &p, size_t k, size_t i, 
 
     double subres2 = vec_pxi * vec_pxj;
 
-    return (subres1 - subres2) * inv_pres3;
+    return (subres1 - subres2) * 0.125 / pres / pres / pres;
 }
 
 template<std::size_t N, std::size_t M>
@@ -234,7 +237,7 @@ double InducedMetricTensor<N, M>::getCoord(const Point<N> &p, std::size_t i, std
     vec_pxi.subtract(vec_mxi);
     vec_pxj.subtract(vec_mxj);
     double subres = vec_pxi * vec_pxj;
-    return subres * inv_pres2;
+    return 0.25 * subres / pres / pres;
 }
 
 template class InducedMetricTensor<1,2>;

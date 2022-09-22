@@ -18,10 +18,6 @@ public:
     // In each implementation the user must be sure that it is a polylinear form in each point!
 };
 
-
-
-
-
 template<std::size_t N>
 class MetricTensor : public AbstractTensor<2,N>
 {
@@ -50,9 +46,6 @@ protected:
     double dk_gij(const Point<N>& pt, size_t k, size_t r, size_t j) const;
     double pres, inv_pres2, inv_pres3;
 
-    Vec<M> dv1p, dv1m, dv2p, dv2m;
-    Vec<M> vec_pxi, vec_mxi, vec_pxj, vec_mxj;
-
 public:
     InducedMetricTensor<N, M>(double pres=eps);
 
@@ -80,11 +73,12 @@ inline double partialDer(const Point<N>& A_, size_t i, const std::function<doubl
     return (f_next - f_prev) / (2 * step);
 }
 
-//template<std::size_t N>
-//inline double partialDer(const Point<N>& A, const Vec<N>& dir,  std::function<double(const Point<N>&)>& f, double step = eps)
-//{
-//    return (f(A + dir * step) - f(A + dir * (-step))) / (2 * step) ;
-//}
+template<std::size_t N>
+inline double partialDer(const Point<N>& A, const Vec<N>& dir,  std::function<double(const Point<N>&)>& f, double step = eps)
+{
+    return (f(A + dir * step) - f(A + dir * (-step))) / (2 * step) ;
+}
+
 
 
 

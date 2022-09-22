@@ -1,115 +1,90 @@
 #include "ellipsoid.h"
 
+template<std::size_t N>
+Point<N> Inversion<N>::operator ()(const Point<N> & P)
+{
+    double norm2 = P.norm2();
+    if(norm2 == 0) {
+        return P;
+    }
+    Point<N> P1 = P;
+    P1.scale(radious2 / norm2);
+    return P1;
+}
 
 template<std::size_t N>
-void proj_north_plane_to_sphere(const Point<N> & p, Point<N+1> & pp)
+EllipsoidMetric<N>::EllipsoidMetric(const std::array<double, N+1> &proportions, const PLAIN_POSITION pos) : proportions(proportions)
 {
+    if(pos == NORTH) {
+        shift = -1.0;
+    } else if (pos == SOUTH){
+        shift = 1.0;
+    }
+}
+
+template<std::size_t N>
+Point<N+1> EllipsoidMetric<N>::gen_func(const Point<N> & p) const
+{
+    Point<N+1> pp;
     for(size_t i = 1; i < N+1; i++) {
         pp[i] = p[i-1];
     }
 
-    pp[0] = 1; // Upper plane!
+    pp[0] = shift;
     Vec<N+1> a_pp = pp;
-    a_pp[0] += 1;
+    a_pp[0] += shift;
 
     double t = 4.0 / a_pp.norm2();
     a_pp.scale(t);
     pp = a_pp;
-    pp[0] -= 1;
-}
+    pp[0] -= shift;
 
-template<std::size_t N>
-void proj_south_plane_to_sphere(const Point<N> & p, Point<N+1> & pp)
-{
-    for(size_t i = 1; i < N+1; i++) {
-        pp[i] = p[i-1];
+    for(size_t i = 0; i < N+1; i++) {
+        pp[i] *= proportions[i];
     }
-    pp[0] = -1; // Down plane!
 
-    Vec<N+1> a_pp = pp;
-
-    a_pp[0] -= 1;
-    double t = 4.0 / a_pp.norm2();
-    a_pp.scale(t);
-    pp = a_pp;
-    pp[0] += 1;
+    return pp;
 }
 
 template<std::size_t N>
-Sphere<N>::Sphere(double controlConst) :
-    RiemannianManifold<N>({}, {}, {})
+Ellipsoid<N>::Ellipsoid(std::array<double, N+1> proportions, double struct_const) :
+    struct_const(struct_const),
+    up_metric(EllipsoidMetric<N>(proportions, NORTH)),
+    down_metric(EllipsoidMetric<N>(proportions, SOUTH))
 {
-    // Atlas
-    Chart<N> open_circle = [controlConst](Point<N> p){return (p.norm() < controlConst);};
-    this->atlas = {open_circle, open_circle};
     this->atlas_size = 2;
-
-
-    // Structure maps
-    this->structureMaps = {
-        {{0,1},
-         [](Point<N> p){
-             if (p == Point<N>::zero()) {
-                 return std::optional<Point<N>>{};
-             }
-             Point<N+1> pp;
-             proj_north_plane_to_sphere(p, pp);
-             s_proj_to_plane(pp, p);
-             return std::make_optional<Point<N>>(p);
-         }
-        },
-
-        {{1,0},
-         [](Point<N> p){
-
-             if (p == Point<N>::zero()) {
-                 return std::optional<Point<N>>{};
-             }
-             Point<N+1> pp;
-             proj_south_plane_to_sphere(p, pp);
-             n_proj_to_plane(pp, p);
-             return std::make_optional<Point<N>>(p);
-            }
-         }
-    };
-
-    // Metric
-    this->metric = {
-        std::make_shared<InducedMetricTensor<N, N+1>>(proj_north_plane_to_sphere<N>),
-        std::make_shared<InducedMetricTensor<N, N+1>>(proj_south_plane_to_sphere<N>)
-    };
 }
 
-template<size_t N>
-void s_proj_to_plane(const Point<N+1> & p1, Point<N> & res)
+template<std::size_t N>
+bool Ellipsoid<N>::changePointIndex(Point<N> &pt, chart_index oldIndex, chart_index newIndex) const
 {
-    if (p1[0] == 1) {
-        res = Point<N>::zero();
-        return;
+    //std::cout << "Ellipsoid<N>::changePointIndex: " << pt.to_str() << "; " << oldIndex << " " << newIndex << std::endl;
+    if (oldIndex == newIndex) {
+        return false;
     }
-    double t = -2.0 / (p1[0] - 1.0);
-    for(size_t i = 0; i < N; i++) {
-        res[i] = t * p1[i+1];
+
+    double norm2 = pt.norm2();
+    if(norm2 == 0.0) {
+        return false;
     }
+    pt.scale(4.0 / norm2);
+    return true;
 }
 
-template<size_t N>
-void n_proj_to_plane(const Point<N+1> & p1, Point<N> & res)
+template<std::size_t N>
+bool Ellipsoid<N>::isPoint(const Point<N> &pt, chart_index) const
 {
-    if (p1[0] == -1) {
-        res = Point<N>::zero();
-        return;
-    }
-
-    double t = 2.0 / (p1[0] + 1.0);
-
-    for(size_t i = 0; i < N; i++) {
-        res[i] = t * p1[i+1];
-    }
+    return pt.norm2() <= struct_const;
 }
 
-template class Sphere<1>;
-template class Sphere<2>;
-template class Sphere<3>;
+template<std::size_t N>
+const MetricTensor<N> &Ellipsoid<N>::getMetric(chart_index i) const
+{
+    if (i == 0) return this->up_metric;
+    if (i == 1) return this->down_metric;
 
+    throw std::invalid_argument("Ellipsoid<N>::getMetric : chart index must be either 0 or 1");
+}
 
+template class Ellipsoid<3>;
+template class EllipsoidMetric<3>;
