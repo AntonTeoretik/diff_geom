@@ -34,7 +34,7 @@ public:
         /*if (pp.norm2() >= 100) {
             return {100.0, 100.0, 100.0};
         }*/
-        pp.scale(4);
+        //pp.scale(4);
 
         int res = int(0.1 - abs(pp[0]) > 0) + int(0.1 - abs(pp[1]) > 0) + int(0.1 - abs(pp[2]) > 0);
         if (res < 1) {
@@ -59,7 +59,7 @@ int main()
     //auto metr = EllipsoidMetric<3>({1,1,1,1}, NORTH);
     //std::cout << "Metr " << metr({0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}) << std::endl ;
 
-    Renderer rend(S, f, {0, {5,5,1}}, w);
+    Renderer rend(S, f, {1, {2,2,2}}, w);
 
 
     rend.number_of_points = 330;
@@ -73,7 +73,7 @@ int main()
     rend.screen.distance_to_screen = 3.0;
 
 
-    rend.setBasis({-5, -5, -1}, {0, 0, -1}, {0, 1, 0});
+    rend.setBasis({-1, -1, -1}, {0, 0, -1}, {0, 1, 0});
 
 
 
