@@ -5,7 +5,7 @@ Vec<3> Screen::lookAtPixel(size_t x, size_t y) const
 {
     double real_x = (double(x) * width) / double(w_resolution) - (0.5 * width);
     double real_y =  (0.5 * height) - (double(y) * height) / double(h_resolution);
-    return Vec<3>{real_x, real_y, distance_to_screen}.normalized();
+    return Vec<3>{distance_to_screen, real_x, real_y};
 }
 
 Vec<3> Renderer::trace_one_pixel(size_t x, size_t y) const

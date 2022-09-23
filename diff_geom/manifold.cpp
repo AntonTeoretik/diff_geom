@@ -77,9 +77,14 @@ T AbstractRiemannianManifold<N>::integrateAlongPath(genPoint<N> start,
 
     double current_time = 0.0;
 
-    Point<N> prev = start.p;
-    Point<N> now = prev + (dir * step); // Possible trouble here
     chart_index cur_index = start.i;
+    Point<N> prev = start.p;
+
+    //NORMALIZE DIR
+    double norm2 = getMetric(cur_index)(prev, dir, dir);
+    dir.scale(1.0 / sqrt(norm2));
+
+    Point<N> now = prev + (dir * step); // Possible trouble here
 
     T res = func(genPoint<N>{cur_index, now}) * weight(0.0) * step;
 
@@ -135,6 +140,7 @@ void AbstractRiemannianManifold<N>::doOneStepWithChange(Point<N> &prev, Point<N>
                     cur_index = new_index;
 
                     change_failed = false;
+
                     break;
                 }
             }
