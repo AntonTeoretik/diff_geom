@@ -3,85 +3,104 @@
 
 
 template<std::size_t N>
-MetricTensor<N>::MetricTensor()
+CUDA_F MetricTensor<N>::MetricTensor()
 {
-
+    for(std::size_t i = 0; i < N; i++) {
+        for(std::size_t j = 0; j < N; j++) {
+            _basis[i][j] = (i == j ? 1.0 : 0.0);
+        }
+    }
 }
 
 template<std::size_t N>
-double MetricTensor<N>::operator()(const Point<N>& p, const std::array<Vec<N>, 2> &vecs) const
+CUDA_F double MetricTensor<N>::call_array(const Point<N>& p, const Vec<N>* vecs) const
 {
     return (*this)(p, vecs[0], vecs[1]);
 }
 
 
 template<std::size_t N>
-Matrix2D<N> MetricTensor<N>::getMatrix(const Point<N>& P) const
+CUDA_F Matrix2D<N> MetricTensor<N>::getMatrix(const Point<N>& P) const
 {
-    return Matrix2D<N>([this, &P](int i, int j){return this->getCoord(P, i, j); });
-}
-
-template<std::size_t N>
-double MetricTensor<N>::getCoord(const Point<N>& P, std::size_t i, std::size_t j) const
-{
-    return (*this)(P, basis<N>[i], basis<N>[j]);
-}
-
-template<std::size_t N>
-double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, const Point<N>& p) const
-{
-    double res = 0;
-
-    Matrix2D<N> MgInv = getMatrix(p).inverse();
-
-    for(std::size_t r = 0; r < N; r++) {
-        double dk_grj = partialDer<N>(p, k, [this, r, j](const Point<N>& pp){return this->getCoord(pp, r, j);} );
-        double dj_grk = partialDer<N>(p, j, [this, r, k](const Point<N>& pp){return this->getCoord(pp, r, k);} );
-        double dr_gjk = partialDer<N>(p, r, [this, k, j](const Point<N>& pp){return this->getCoord(pp, j, k);} );
-
-        res += MgInv[l][r] * ( dk_grj + dj_grk - dr_gjk );
+    Matrix2D<N> m;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            m.get(i, j) = getCoord(P, i, j);
+        }
     }
-    return res * 0.5;
+    return m;
 }
 
 template<std::size_t N>
-Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, const Point<N>& p) const
+CUDA_F double MetricTensor<N>::getCoord(const Point<N>& P, std::size_t i, std::size_t j) const
+{
+    // printf("GetCoord %lu %lu %lu\n", N, i, j);
+    // return 0.0;
+    return (*this)(P, _basis[i], _basis[j]);
+}
+
+// template<std::size_t N>
+// CUDA_F double MetricTensor<N>::krist(std::size_t l, std::size_t j, std::size_t k, const Point<N>& p) const
+// {
+//     double res = 0;
+//     return 0;
+
+//     // Matrix2D<N> MgInv = getMatrix(p).inverse();
+
+//     // for(std::size_t r = 0; r < N; r++) {
+//     //     double dk_grj = partialDer<N>(p, k, [this, r, j] __device__ (const Point<N>& pp){return this->getCoord(pp, r, j);} );
+//     //     double dj_grk = partialDer<N>(p, j, [this, r, k] __device__ (const Point<N>& pp){return this->getCoord(pp, r, k);} );
+//     //     double dr_gjk = partialDer<N>(p, r, [this, k, j] __device__ (const Point<N>& pp){return this->getCoord(pp, j, k);} );
+
+//     //     res += MgInv.get(l, r) * ( dk_grj + dj_grk - dr_gjk );
+//     // }
+//     // return res * 0.5;
+// }
+
+template<std::size_t N>
+CUDA_F Matrix2D<N> MetricTensor<N>::kristMatrix(std::size_t l, const Point<N>& p) const
 {
     Matrix2D<N> res;
+    // return res;
     for (size_t i = 1; i < N; i++) {
         for (size_t j = 0; j < i; j++) {
             double kr = krist(l, i, j, p);
-            res[i][j] = kr;
-            res[j][i] = kr;
+            res.get(i, j) = kr;
+            res.get(j, i) = kr;
         }
     }
     for (size_t i = 0; i < N; i++) {
-        res[i][i] = this->krist(l, i, i, p);
+        res.get(i, i) = this->krist(l, i, i, p);
     }
 
     //return Matrix2D<N>([this, l, &p](auto i, auto j){return this->krist(l, i, j, p);});
     return res;
 }
 
+
 template<std::size_t N>
-std::vector<Vec<N> > MetricTensor<N>::orthogonalize(const Point<N>& pt, const std::vector<Vec<N> > &vecs, bool norm) const
+CUDA_F void MetricTensor<N>::orthogonalize(
+    const Point<N>& pt, const Span<Vec<N>>& vecs, bool norm, 
+    Span<Vec<N>>& res, int& n_out) const
 {
-    std::vector<Vec<N> > res = {};
-    for(size_t i = 0; i < vecs.size(); i++) {
-        Vec<N> vec = vecs[i];
-        for(size_t j = 0; j < res.size(); j++) {
+    n_out = 0;
+    // std::vector<Vec<N> > res = {};
+    for (size_t i = 0; i < vecs.size; i++) {
+        Vec<N> vec = vecs.data[i];
+        for(size_t j = 0; j < n_out; j++) {
             vec = vec - res[j] * ((*this)(pt, vecs[i], res[j]) / (*this)(pt, res[j], res[j]) );
         }
-        res.push_back(vec);
+        res.data[n_out] = vec;
+        ++n_out;
     }
     if (norm) {
-        for(auto& v : res) {
+        for(int i = 0; i < n_out; ++i) {
             //std::cout << "Scale: " << std::sqrt((*this)(pt, v, v)) << std::endl;
             //std::cout << "v: " << v.to_str() << std::endl;
-            v.scale(1.0 / std::sqrt((*this)(pt, v, v)));
+            auto v = res.data[i];
+            res.data[i].scale(1.0 / std::sqrt((*this)(pt, v, v)));
         }
     }
-    return res;
 }
 
 
@@ -91,7 +110,8 @@ template class MetricTensor<3>;
 
 
 template<std::size_t N, std::size_t M>
-InducedMetricTensor<N, M>::InducedMetricTensor(double pres) :
+CUDA_F InducedMetricTensor<N, M>::InducedMetricTensor(double pres) :
+    MetricTensor<N>(),
     pres(pres),
     inv_pres2(0.25 / (pres * pres)),
     inv_pres3(0.125 / (pres * pres * pres))
@@ -101,7 +121,7 @@ InducedMetricTensor<N, M>::InducedMetricTensor(double pres) :
 
 
 template<std::size_t N, std::size_t M>
-double InducedMetricTensor<N, M>::operator()(const Point<N> & p, const Vec<N> & v1_, const Vec<N> & v2_) const
+CUDA_F double InducedMetricTensor<N, M>::operator()(const Point<N> & p, const Vec<N> & v1_, const Vec<N> & v2_) const
 {
     Vec<N> v1 = v1_;
     Vec<N> v2 = v2_;
@@ -127,7 +147,7 @@ double InducedMetricTensor<N, M>::operator()(const Point<N> & p, const Vec<N> & 
 };
 
 template<std::size_t N, std::size_t M>
-double InducedMetricTensor<N, M>::dk_gij(const Point<N> &p, size_t k, size_t i, size_t j) const
+CUDA_F double InducedMetricTensor<N, M>::dk_gij(const Point<N> &p, size_t k, size_t i, size_t j) const
 {
     //partialDer<N>(pt, k, [this, i, j](Point<N>& pp){return this->getCoord(pp, i, j);} );
 
@@ -186,14 +206,16 @@ double InducedMetricTensor<N, M>::dk_gij(const Point<N> &p, size_t k, size_t i, 
 }
 
 template<std::size_t N, std::size_t M>
-double InducedMetricTensor<N, M>::krist(std::size_t l, std::size_t j, std::size_t k, const Point<N> &p) const
+CUDA_F double InducedMetricTensor<N, M>::krist(std::size_t l, std::size_t j, std::size_t k, const Point<N> &p) const
 {
     double res = 0;
+    // double x = getCoord(p, 0, 0);;
+    // return res;
 
     Matrix2D<N> Mg;
     for(size_t i = 0; i < N; i++) {
-        for(size_t j = 0; j < N; j++) {
-            Mg[i][j] = getCoord(p, i, j);
+        for(size_t jj = 0; jj < N; jj++) {
+            Mg.get(i, jj) = getCoord(p, i, jj);
         }
     }
     //Matrix2D<N> MgInv = MetricTensor<N>::getMatrix(p).inverse();
@@ -204,14 +226,15 @@ double InducedMetricTensor<N, M>::krist(std::size_t l, std::size_t j, std::size_
         double dj_grk = dk_gij(p, j, k, r);
         double dr_gjk = dk_gij(p, r, j, k);
 
-        res += MgInv[l][r] * ( dk_grj + dj_grk - dr_gjk );
+        res += MgInv.get(l, r) * ( dk_grj + dj_grk - dr_gjk );
     }
     return res * 0.5;
 }
 
 template<std::size_t N, std::size_t M>
-double InducedMetricTensor<N, M>::getCoord(const Point<N> &p, std::size_t i, std::size_t j) const
+CUDA_F double InducedMetricTensor<N, M>::getCoord(const Point<N> &p, std::size_t i, std::size_t j) const
 {
+    // printf("GetCoord\n");
     Point<N> pt = p;
     double pt_i = pt[i];
     double pt_j = pt[j];

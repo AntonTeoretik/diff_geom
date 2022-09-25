@@ -12,8 +12,8 @@ class Inversion : public diffeomorphism<N>
 protected:
     double radious2;
 public:
-    Inversion(double radious = 1.0) : radious2(radious*radious) {}
-    Point<N> operator ()(const Point<N> &);
+    CUDA_F Inversion(double radious = 1.0) : radious2(radious*radious) {}
+    CUDA_F Point<N> operator ()(const Point<N> &);
 };
 
 template<std::size_t N>
@@ -21,10 +21,10 @@ class EllipsoidMetric : public InducedMetricTensor<N, N+1>
 {
 protected:
     double shift;
-    std::array<double, N+1> proportions;
+    double proportions[N+1];
 public:
-    EllipsoidMetric(const std::array<double, N+1>& proportions, const PLAIN_POSITION pos);
-    Point<N+1> gen_func(const Point<N> &) const;
+    CUDA_F EllipsoidMetric(const Vec<N+1>& proportions, const PLAIN_POSITION pos);
+    CUDA_F Point<N+1> gen_func(const Point<N> &) const override;
 };
 
 
@@ -35,13 +35,13 @@ protected:
     double struct_const;
     EllipsoidMetric<N> up_metric, down_metric;
 public:
-    Ellipsoid(std::array<double, N+1> proportions, double struct_const = 9.0);
+    CUDA_F Ellipsoid(const Vec<N+1>& proportions, double struct_const = 9.0);
 
     // AbstractManifold interface
 public:
-    virtual bool changePointIndex(Point<N> &pt, chart_index oldIndex, chart_index newIndex) const;
-    virtual bool isPoint(const Point<N> &pt, chart_index i) const;
-    const MetricTensor<N>& getMetric(chart_index i) const;
+    virtual CUDA_F bool changePointIndex(Point<N> &pt, chart_index oldIndex, chart_index newIndex) const;
+    virtual CUDA_F bool isPoint(const Point<N> &pt, chart_index i) const;
+    CUDA_F const MetricTensor<N>& getMetric(chart_index i) const;
 };
 
 

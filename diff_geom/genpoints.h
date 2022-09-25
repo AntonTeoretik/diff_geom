@@ -2,6 +2,7 @@
 #define GENPOINTS_H
 
 #include "algebra.h"
+#include "util.h"
 
 
 using chart_index = std::size_t;
@@ -16,14 +17,14 @@ template <std::size_t N, class T>
 class genFunction
 {
 public:
-    virtual T operator () (const genPoint<N>&) const = 0;
+    virtual CUDA_F T operator () (const genPoint<N>&) const = 0;
 };
 
 template <std::size_t N>
 class diffeomorphism
 {
 public:
-    virtual Point<N> operator () (const Point<N>&) const = 0;
+    virtual CUDA_F Point<N> operator () (const Point<N>&) const = 0;
 };
 
 

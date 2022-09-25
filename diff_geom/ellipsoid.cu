@@ -1,7 +1,7 @@
 #include "ellipsoid.h"
 
 template<std::size_t N>
-Point<N> Inversion<N>::operator ()(const Point<N> & P)
+CUDA_F Point<N> Inversion<N>::operator ()(const Point<N> & P)
 {
     double norm2 = P.norm2();
     if(norm2 == 0) {
@@ -13,8 +13,11 @@ Point<N> Inversion<N>::operator ()(const Point<N> & P)
 }
 
 template<std::size_t N>
-EllipsoidMetric<N>::EllipsoidMetric(const std::array<double, N+1> &proportions, const PLAIN_POSITION pos) : proportions(proportions)
+CUDA_F EllipsoidMetric<N>::EllipsoidMetric(const Vec<N+1>& _proportions, const PLAIN_POSITION pos) 
 {
+    for (int i = 0; i < N + 1; ++i) {
+        this->proportions[i] = _proportions[i];
+    }
     if(pos == NORTH) {
         shift = -1.0;
     } else if (pos == SOUTH){
@@ -23,7 +26,7 @@ EllipsoidMetric<N>::EllipsoidMetric(const std::array<double, N+1> &proportions, 
 }
 
 template<std::size_t N>
-Point<N+1> EllipsoidMetric<N>::gen_func(const Point<N> & p) const
+CUDA_F Point<N+1> EllipsoidMetric<N>::gen_func(const Point<N> & p) const
 {
     Point<N+1> pp;
     for(size_t i = 1; i < N+1; i++) {
@@ -47,7 +50,7 @@ Point<N+1> EllipsoidMetric<N>::gen_func(const Point<N> & p) const
 }
 
 template<std::size_t N>
-Ellipsoid<N>::Ellipsoid(std::array<double, N+1> proportions, double struct_const) :
+CUDA_F Ellipsoid<N>::Ellipsoid(const Vec<N+1>& proportions, double struct_const) :
     struct_const(struct_const),
     up_metric(EllipsoidMetric<N>(proportions, NORTH)),
     down_metric(EllipsoidMetric<N>(proportions, SOUTH))
@@ -56,7 +59,7 @@ Ellipsoid<N>::Ellipsoid(std::array<double, N+1> proportions, double struct_const
 }
 
 template<std::size_t N>
-bool Ellipsoid<N>::changePointIndex(Point<N> &pt, chart_index oldIndex, chart_index newIndex) const
+CUDA_F bool Ellipsoid<N>::changePointIndex(Point<N> &pt, chart_index oldIndex, chart_index newIndex) const
 {
     //std::cout << "Ellipsoid<N>::changePointIndex: " << pt.to_str() << "; " << oldIndex << " " << newIndex << std::endl;
     if (oldIndex == newIndex) {
@@ -72,18 +75,20 @@ bool Ellipsoid<N>::changePointIndex(Point<N> &pt, chart_index oldIndex, chart_in
 }
 
 template<std::size_t N>
-bool Ellipsoid<N>::isPoint(const Point<N> &pt, chart_index) const
+CUDA_F bool Ellipsoid<N>::isPoint(const Point<N> &pt, chart_index) const
 {
     return pt.norm2() <= struct_const;
 }
 
 template<std::size_t N>
-const MetricTensor<N> &Ellipsoid<N>::getMetric(chart_index i) const
+CUDA_F const MetricTensor<N> &Ellipsoid<N>::getMetric(chart_index i) const
 {
     if (i == 0) return this->up_metric;
     if (i == 1) return this->down_metric;
+    return this->down_metric;
 
-    throw std::invalid_argument("Ellipsoid<N>::getMetric : chart index must be either 0 or 1");
+    // exit(1);
+    // throw std::invalid_argument("Ellipsoid<N>::getMetric : chart index must be either 0 or 1");
 }
 
 template class Ellipsoid<3>;
